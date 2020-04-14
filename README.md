@@ -19,3 +19,18 @@ The API for the ParaLibrary application. All routes start with `https://paralibr
 `GET /books/:id` - Get a single book object by its id\
 `PUT /books/:id`- Modify a book object by its id\
 `DELETE /books/:id` - Delete a book object by its id\
+
+## Users
+### The User Object
+```json
+{
+  "id": 123,
+  "display_name": "Up to 255 chars",
+  "name": "Up to 255 chars"
+}
+```
+### Routes
+`GET /users/:id` - Get a single users object by its id\
+`PUT /users/:id`- Modify a users object by its id\
+`DELETE /users/:id` - Delete a users object by its id\
+
