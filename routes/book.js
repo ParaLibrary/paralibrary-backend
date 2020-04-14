@@ -1,10 +1,19 @@
 var express = require("express");
 var router = express.Router();
+var db = require('../db.js');
 
 router
-  .route("/:book_id")
+  .route("/:id")
   .get(function (req, res) {
-    res.json({ foo: "GET book" });
+    db.books.get(req.params.id)
+    .then(function(book) {
+      if(!book) {
+        res.statusCode = 404;
+        return;
+      }
+      res.statusCode = 200;
+      res.json(book);
+    })
   })
   .put(function (req, res) {})
   .post(function (req, res) {})
