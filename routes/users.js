@@ -6,6 +6,9 @@ router.route('/')
   .get(function(req, res) {
     // Get all users
   })
+  .post(function(req, res){
+
+  })
 
 router.route('/:id')
   .get(function (req, res) {
@@ -20,10 +23,15 @@ router.route('/:id')
     })
   })
   .put(function(req, res) {
-
-  })
-  .post(function(req, res) {
-      
+    let user = req.body;
+    db.users.insertOrUpdate(user)
+    .then((result) => {
+      if(result.something) { // TODO
+        res.statusCode = 404;
+        return;
+      }
+      res.statusCode = 200;
+    })
   })
   .delete(function(req, res) {
       

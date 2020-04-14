@@ -47,7 +47,7 @@ var users = (function() {
       })
     },
     insertOrUpdate: function(user) {
-      return pool.query('INSERT INTO users VALUES (?,?,?)', [ user.id, user.display_name, user.name ])
+      return pool.query('INSERT INTO users VALUES (?,?,?) ON DUPLICATE KEY UPDATE display_name = VALUES(display_name)', [ user.id, user.display_name, user.name ])
     },
     delete: function() {
 
