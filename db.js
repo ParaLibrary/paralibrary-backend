@@ -35,6 +35,27 @@ var books = (function() {
   }
 })();
 
+var users = (function() {
+  return {
+    get: function(userId) {
+      return pool.query('SELECT * FROM users WHERE id = ?', [ userId ])
+      .then(([rows, fields]) => {
+        if(!rows || rows.length === 0) {
+          return null;
+        }
+        return rows[0];
+      })
+    },
+    insertOrUpdate: function(user) {
+      return pool.query('INSERT INTO users VALUES (?,?,?)', [ user.id, user.display_name, user.name ])
+    },
+    delete: function() {
+
+    }
+  }
+})();
+
 module.exports = {
-  books
+  books,
+  users
 }
