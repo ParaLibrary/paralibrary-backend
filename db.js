@@ -10,6 +10,14 @@ var pool = mysql.createPool({
   connectionLimit: 5
 }).promise();
 
+pool.query('SELECT 1+1')
+.then(() => {
+  console.log('Connected to db');
+})
+.catch((e) => {
+  console.error('Can\'t establish connection to the database\n' + e);
+})
+
 var books = (function() {
   return {
     get: function(bookId) {
@@ -26,14 +34,6 @@ var books = (function() {
     }
   }
 })();
-
-pool.query('SELECT 1+1')
-.then(() => {
-  console.log('Connected to db');
-})
-.catch((e) => {
-  console.error('Can\'t establish connection to the database\n' + e);
-})
 
 module.exports = {
   books
