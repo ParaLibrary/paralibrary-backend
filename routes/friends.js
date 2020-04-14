@@ -1,10 +1,15 @@
 var express = require("express");
 var router = express.Router();
+var db = require('../db.js');
 
-router
-  .route("/:loan_id")
+router.route('/')
+  .get(function(req, res) {
+    // Get all friends
+  })
+
+router.route("/:id")
   .get(function (req, res) {
-    res.json({ foo: "GET loan" });
+    res.json({ foo: "GET friend" });
   })
   .put(function (req, res) {})
   .post(function (req, res) {})

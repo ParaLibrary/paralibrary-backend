@@ -21,7 +21,7 @@ pool.query('SELECT 1+1')
 var books = (function() {
   return {
     get: function(bookId) {
-      return pool.query('SELECT * FROM book WHERE id = ?', [ bookId ])
+      return pool.query('SELECT * FROM books WHERE id = ?', [ bookId ])
       .then(([rows, fields]) => {
         if(!rows || rows.length === 0) {
           return null;
@@ -30,7 +30,7 @@ var books = (function() {
       })
     },
     delete: function(bookId) {
-      return pool.query('DELETE FROM book WHERE id = ?', [ bookId ]);
+      return pool.query('DELETE FROM books WHERE id = ?', [ bookId ]);
     }
   }
 })();

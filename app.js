@@ -9,12 +9,12 @@ app.use(bodyParser.json());
 
 var port = process.env.PORT || 8080; // set our port
 
-var bookRoutes = require("./routes/book");
-var bookCategoryRoutes = require("./routes/bookCategory");
-var categoryRoutes = require("./routes/category");
-var friendRoutes = require("./routes/friend");
-var libraryRoutes = require("./routes/library");
-var loanRoutes = require("./routes/loan");
+var bookRoutes = require("./routes/books");
+var bookCategoryRoutes = require("./routes/booksCategories");
+var categoryRoutes = require("./routes/categories");
+var friendRoutes = require("./routes/friends");
+var libraryRoutes = require("./routes/libraries");
+var loanRoutes = require("./routes/loans");
 var userRoutes = require("./routes/users");
 
 var router = express.Router();
@@ -23,12 +23,12 @@ router
     console.log("Something is happening.");
     next();
   })
-  .use("/book", bookRoutes)
-  .use("/bookCategory", bookCategoryRoutes)
-  .use("/category", categoryRoutes)
-  .use("/friend", friendRoutes)
-  .use("/library", libraryRoutes)
-  .use("/loan", loanRoutes)
+  .use("/books", bookRoutes)
+  .use("/books-categories", bookCategoryRoutes)
+  .use("/categories", categoryRoutes)
+  .use("/friends", friendRoutes)
+  .use("/libraries", libraryRoutes)
+  .use("/loans", loanRoutes)
   .use("/users", userRoutes);
 
 // Routes start with /api
