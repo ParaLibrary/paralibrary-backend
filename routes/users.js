@@ -2,12 +2,31 @@ var express = require("express");
 var router = express.Router();
 var db = require("../db.js");
 
-router
-  .route("/")
+router.route("/")
   .get(function (req, res) {
-    // Get all users
+    res.statusCode = 200;
+    res.json({
+      "id": 1,
+      "display_name": "BobJoe",
+      "name": "Robert Joseph"
+    })
   })
-  .post(function (req, res) {});
+  .put(function(req, res) {
+    res.statusCode = 200;
+    res.end();
+  })
+  .post(function (req, res) {
+    res.statusCode = 200;
+      res.json({
+      "id": 2,
+      "display_name": "Anon421235",
+      "name": "Michael Jackson"
+    })
+  })
+  .delete(function(req, res) {
+    res.statusCode = 200;
+    res.end();
+  })
 
 router
   .route("/:id")
