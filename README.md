@@ -88,13 +88,14 @@ status is an ENUM and can be referenced by number (0,1,2) or string name ("reque
   "owner_id": 123,
   "requester_id": 123,
   "book_id": 123,
-  "request_date": "datetime",
-  "accept_date": "datetime",
-  "loan_start_date": "datetime",
-  "loan_end_date": "datetime",
+  "request_date": "2020-04-16T15:38:49.000Z",
+  "accept_date": "2020-04-16T15:38:49.000Z",
+  "loan_start_date": "2020-04-16T15:38:49.000Z",
+  "loan_end_date": "2020-04-16T15:38:49.000Z",
   "status": "pending"
 }
 ```
+The timestamps are return as strings\
 status is an ENUM and can be referenced by number (0,1,2,3,4) or string name ("pending"|"accepted"|"loaned"|"returned"|"late"). The API always returns the string version.
 ### Routes
  Type | Route | Description 
