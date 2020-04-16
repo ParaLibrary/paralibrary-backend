@@ -16,10 +16,10 @@ All routes start with `https://paralibrary.digital/api`
 }
 ```
 ### Routes
-`GET /books` - Get all the books for the current user\
-`POST /books` - Create a new book\
-`GET /books/:id` - Get a single book object by its id\
-`PUT /books/:id`- Modify a book object by its id\
+`   GET /books`     - Get all the books for the current user. Returns an array of book objects\
+`  POST /books`     - Create a new book\
+`   GET /books/:id` - Get a single book object by its id\
+`   PUT /books/:id` - Modify a book object by its id\
 `DELETE /books/:id` - Delete a book object by its id
 
 ## Users
@@ -32,12 +32,13 @@ All routes start with `https://paralibrary.digital/api`
 }
 ```
 ### Routes
-`GET /users/:id` - Get a single users object by its id\
-`PUT /users/:id`- Modify a users object by its id\
-`DELETE /users/:id` - Delete a users object by its id
+`  POST /users` - Create a new user\
+`   GET /users` - Get the current user's object\
+`   PUT /users` - Modify the user's object\
+`DELETE /users` - Delete the user's object
 
 ## Categories
-### The Categories Object
+### The Category Object
 ```json
 {
   "id": 123,
@@ -46,28 +47,30 @@ All routes start with `https://paralibrary.digital/api`
 }
 ```
 ### Routes
-`GET /categories` - Get all the categories for the current user\
-`POST /categories` - Create a new categories\
-`GET /categories/:id` - Get a single categories object by its id\
-`PUT /categories/:id`- Modify a categories object by its id\
-`DELETE /categories/:id` - Delete a categories object by its id
+`   GET /categories`     - Get all the categories for the current user\
+`  POST /categories`     - Create a new category\
+`   GET /categories/:id` - Get a single category object by its id\
+`   PUT /categories/:id` - Modify a category object by its id\
+`DELETE /categories/:id` - Delete a category object by its id
 
-## Friendships
-### The Friendships Object
+## Friends
+### A Friend Object
 ```json
 {
-  "friend_a": 123,
-  "friend_b": 123,
-  "status": ("requested" | "waiting" | "friends")
+  "id": 123,
+  "display_name": "Up to 255 chars",
+  "name": "Up to 255 chars",
+  "status": "requested"
 }
 ```
-status is an ENUM and can be referenced by number (0,1,2) or string name.
+A friend object is just a user object with an extra property "status" that tells the relationship of the friend to the user.\
+status is an ENUM and can be referenced by number (0,1,2) or string name ("requested" | "waiting" | "friends"). The API will always return the string version.
 ### Routes
-`GET /friendships` - Get all the friendships for the current user\
-`POST /friendships` - Create a new friendship\
-`GET /friendships/:id` - Get a single friendships object by its id\
-`PUT /friendships/:id`- Modify a friendships object by its id\
-`DELETE /friendships/:id` - Delete a friendships object by its id
+`   GET /friends`             - Get all the friends for the current user\
+`  POST /friends/:id/request` - Request friendship with the target user\
+`  POST /friends/:id/accept`  - Accept friendship request with the target user\
+`   PUT /friends/:id`         - Modify a friendships object by its id.\
+`DELETE /friends/:id`         - Delete a friendships object by its id
 
 ## Loans
 ### The Loans Object
@@ -81,16 +84,15 @@ status is an ENUM and can be referenced by number (0,1,2) or string name.
   "accept_date": datetime,
   "loan_start_date": datetime,
   "loan_end_date": datetime,
-  "status": ("pending"|"accepted"|"loaned"|"returned"|"late")
+  "status": "pending"
 }
 ```
-status is an ENUM and can be referenced by number (0,1,2,3,4) or string name.
+status is an ENUM and can be referenced by number (0,1,2,3,4) or string name ("pending"|"accepted"|"loaned"|"returned"|"late"). The API always returns the string version.
 ### Routes
-`GET /loans` - Get all loans where the user is the owner or requester\
-`POST /loans` - Create a new loan
-`GET /loans/owner` - Get all the loans where the user is the owner\
-`GET /loans/requester` - Get all the loans where the user is the requester\
-`GET /loans/:id` - Get a single loans object by its id\
-`PUT /loans/:id`- Modify a loans object by its id\
-`DELETE /loans/:id` - Delete a loans object by its id
-
+`   GET /loans`           - Get all loans where the user is the owner or requester\
+`  POST /loans`           - Create a new loan
+`   GET /loans/owner`     - Get all the loans where the user is the owner\
+`   GET /loans/requester` - Get all the loans where the user is the requester\
+`   GET /loans/:id`       - Get a single loan by its id\
+`   PUT /loans/:id`       - Modify a loan by its id\
+`DELETE /loans/:id`       - Delete a loan by its id
