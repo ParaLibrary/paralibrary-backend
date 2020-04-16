@@ -24,10 +24,8 @@ router
     next();
   })
   .use("/books", bookRoutes)
-  .use("/books-categories", bookCategoryRoutes)
   .use("/categories", categoryRoutes)
   .use("/friends", friendRoutes)
-  .use("/libraries", libraryRoutes)
   .use("/loans", loanRoutes)
   .use("/users", userRoutes);
 
