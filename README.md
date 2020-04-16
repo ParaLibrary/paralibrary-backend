@@ -36,9 +36,9 @@ All routes start with `https://paralibrary.digital/api`
 ### Routes
  Type | Route | Description 
  ---:| --- | --- 
-`  POST`|`/users` | Create a new user
 `   GET`|`/users` | Get the current user's object
 `   PUT`|`/users` | Modify the user's object
+`  POST`|`/users` | Create a new user
 `DELETE`|`/users` | Delete the user's object
 
 ## Categories
@@ -75,10 +75,10 @@ status is an ENUM and can be referenced by number (0,1,2) or string name ("reque
  Type | Route | Description 
  ---:| --- | --- 
 `   GET`|`/friends`             | Get all the friends for the current user
-`  POST`|`/friends/:id/request` | Request friendship with the target user
-`  POST`|`/friends/:id/accept`  | Accept friendship request with the target user
 `   PUT`|`/friends/:id`         | Modify a friendships object by its id
 `DELETE`|`/friends/:id`         | Delete a friendships object by its id
+`  POST`|`/friends/:id/request` | Request friendship with the target user
+`  POST`|`/friends/:id/accept`  | Accept friendship request with the target user
 
 ## Loans
 ### The Loans Object
