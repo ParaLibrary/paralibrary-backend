@@ -4,15 +4,43 @@ var db = require('../db.js');
 
 router.route('/')
   .get(function(req, res) {
-    // Get all friends
+    res.statusCode = 200;
+    res.json([
+      {
+        "id": 123,
+        "display_name": "WeichtNoise",
+        "name": "Tait",
+        "status": "friends"
+      },
+      {
+        "id": 166,
+        "display_name": "Dr. Arias",
+        "name": "Carlos Arias",
+        "status": "requested"
+      }
+    ])
   })
 
 router.route("/:id")
-  .get(function (req, res) {
-    res.json({ foo: "GET friend" });
+  .put(function (req, res) {
+    res.statusCode = 200;
+    res.end();
   })
-  .put(function (req, res) {})
-  .post(function (req, res) {})
-  .delete(function (req, res) {});
+  .delete(function (req, res) {
+    res.statusCode = 200;
+    res.end();
+  })
+
+router.route("/:id/request")
+  .post(function(req, res) {
+    res.statusCode = 200;
+    res.end();
+  })
+
+router.route("/:id/accept")
+  .post(function(req, res) {
+    res.statusCode = 200;
+    res.end();
+  })
 
 module.exports = router;
