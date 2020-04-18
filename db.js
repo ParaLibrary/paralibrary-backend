@@ -33,10 +33,17 @@ var books = (function () {
           return rows[0];
         });
     },
+    insertOrUpdate: function (bookId) {
+      return pool.query(
+        "INSERT INTO books VALUES (?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE " + 
+        "title = VALUES(title), author = VALUES(author),",
+        [bookId.id, bookId.userId, bookId.title, bookId.author, bookId.isbn, bookId.summary, bookId.visibility]
+      );
+    },
     delete: function (bookId) {
       return pool.query("DELETE FROM books WHERE id = ?", [bookId]);
     },
-  };
+  }; 
 })();
 
 var users = (function () {
@@ -57,9 +64,14 @@ var users = (function () {
         [user.id, user.display_name, user.name]
       );
     },
+    update: function(user){
+      return pool.query(
+        "UPDATE users SET display_name = ?, name = ? WHERE id = ?",
+        [user.display_name, user.name, user.id]
+      );
+    },
     delete: function (userId) {
       return pool.query("DELETE FROM users WHERE id = ?", [userId]);
-      //"DROP USER IF EXISTS", [userId]   I had this earlier as well.
     },
   };
 })();

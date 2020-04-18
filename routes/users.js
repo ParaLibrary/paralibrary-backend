@@ -7,7 +7,9 @@ router
   .get(function (req, res) {
     // Get all users
   })
-  .post(function (req, res) {});
+  .post(function (req, res) {
+    
+  });
 
 router
   .route("/:id")
@@ -23,24 +25,18 @@ router
   })
   .put(function (req, res) {
     let user = req.body;
-    db.users.insertOrUpdate(user).then((result) => {
-      if (result.something) {
-        // TODO
+    db.users.update(user).then((result) => {
+      /*if (result.something) {    TODO: If something bad happens, send a 404.
         res.statusCode = 404;
         return;
-      }
-      res.statusCode = 200;
-    });
+      }*/
+       res.statusCode = 200;
+       res.end();
+     });
   })
   .delete(function (req, res) {
     db.users.delete(req.params.id).then(function (user) {
-      // call delete
-      //if (user) {   // if user still exists, send an error code
-      //  res.statusCode = 404;
-      //  return;
-      //}
-      res.statusCode = 200; //
-      //res.json(user);
+      res.statusCode = 200;
     });
   });
 
