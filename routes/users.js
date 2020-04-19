@@ -2,37 +2,23 @@ var express = require("express");
 var router = express.Router();
 var db = require("../db.js");
 
-router.route("/")
+router
+  .route("/")
   .get(function (req, res) {
-    res.statusCode = 200;
-    res.json({
-      "id": 1,
-      "display_name": "BobJoe",
-      "name": "Robert Joseph"
-    })
-  })
-  .put(function(req, res) {
-    res.statusCode = 200;
-    res.end();
+    // Get all users
   })
   .post(function (req, res) {
-    res.statusCode = 200;
-      res.json({
-      "id": 2,
-      "display_name": "Anon421235",
-      "name": "Michael Jackson"
-    })
+    let user = req.body;
+    db.users.insert(user).then((result) => {
+      if (result[0].affectedRows === 0) {    // If no rows are affected, send a 404.
+        res.statusCode = 404;
+        res.end();
+        return;
+      }
+       res.statusCode = 200;
+       return res.json.id;
+    });
   })
-  .delete(function(req, res) {
-    res.statusCode = 200;
-    res.end();
-  })
-<<<<<<< HEAD
-  .post(function (req, res) {
-    
-  });
-=======
->>>>>>> origin/master
 
 router
   .route("/:id")
@@ -49,10 +35,11 @@ router
   .put(function (req, res) {
     let user = req.body;
     db.users.update(user).then((result) => {
-      /*if (result.something) {    TODO: If something bad happens, send a 404.
+      if (result[0].affectedRows == 0) {    // If no rows are affected, send a 404.
         res.statusCode = 404;
+        res.end();
         return;
-      }*/
+      }
        res.statusCode = 200;
        res.end();
      });

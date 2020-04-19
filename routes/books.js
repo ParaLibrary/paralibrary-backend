@@ -27,16 +27,17 @@ router.route('/')
     ])
   })
   .post(function(req, res) {
-    res.statusCode = 200;
-    res.json({
-      "id": 127,
-      "user_id": 1,
-      "title": "Test Book 3: The Bookening",
-      "author": "An Author Name",
-      "isbn": "1234567890123",
-      "summary": "An Author Name concludes his thrilling horror series with a new age children's book",
-      "visibility": true
-    })
+    let book = req.body;
+    db.books.insert(book).then((result) => {
+      if (result[0].affectedRows === 0) {    // If no rows are affected, send a 404.
+        res.statusCode = 404;
+        res.end();
+        return
+      }
+       res.statusCode = 200;
+       res.send(result.insertId);
+       res.end();
+    });
   })
 
 router.route("/:id")
@@ -51,17 +52,17 @@ router.route("/:id")
       res.json(book);
     })
   })
-<<<<<<< HEAD
-  .put(function (req, res) {})
-  .post(function (req, res) {
+  .put(function (req, res) {
     let book = req.body;
-    db.books.insertOrUpdate(book).then((result) => {
-      /*if (result.something) {    TODO: If something bad happens, send a 404.
+    db.books.update(book).then((result) => {
+      if (result[0].affectedRows === 0) {    // If no rows are affected, send a 404.
         res.statusCode = 404;
+        res.end();
         return;
-      }*/
-      res.statusCode = 200; 
-    });
+      }
+       res.statusCode = 200;
+       res.end();
+     });
   })
   .delete(function (req, res) {    
     db.books.delete(req.params.id).then(function (book) {
@@ -69,15 +70,5 @@ router.route("/:id")
     });
   });
     
-=======
-  .put(function (req, res) {
-    res.statusCode = 200;
-    res.end();
-  })
-  .delete(function (req, res) {
-    res.statusCode = 200;
-    res.end();
-  });
->>>>>>> origin/master
 
 module.exports = router;

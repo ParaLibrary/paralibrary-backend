@@ -16,8 +16,8 @@ All routes start with `https://paralibrary.digital/api`
 }
 ```
 ### Routes
- Type | Route | Description 
- ---:| --- | --- 
+   Type | Route | Description 
+  ---:| --- | --- 
 `   GET`|` /books`     | Get all the books for the current user. Returns an array of book objects
 `  POST`|` /books`     | Create a new book
 `   GET`|` /books/:id` | Get a single book object by its id

@@ -33,11 +33,16 @@ var books = (function () {
           return rows[0];
         });
     },
-    insertOrUpdate: function (bookId) {
+    insert: function (book) {
       return pool.query(
-        "INSERT INTO books VALUES (?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE " + 
-        "title = VALUES(title), author = VALUES(author),",
-        [bookId.id, bookId.userId, bookId.title, bookId.author, bookId.isbn, bookId.summary, bookId.visibility]
+        "INSERT INTO books (user_id, title, author, isbn, summary, visibility) VALUES (?,?,?,?,?,?)",
+        [book.user_id, book.title, book.author, book.isbn, book.summary, book.visibility] 
+      );
+    },
+    update: function (book) {
+      return pool.query(
+        "UPDATE books SET user_id = ?, title = ?, author = ?, isbn = ?, summary = ?, visibility = ? WHERE id = ?",
+        [book.user_id, book.title, book.author, book.isbn, book.summary, book.visibility, book.id]
       );
     },
     delete: function (bookId) {
@@ -58,10 +63,10 @@ var users = (function () {
           return rows[0];
         });
     },
-    insertOrUpdate: function (user) {
+    insert: function (user) {
       return pool.query(
-        "INSERT INTO users VALUES (?,?,?) ON DUPLICATE KEY UPDATE display_name = VALUES(display_name)",
-        [user.id, user.display_name, user.name]
+        "INSERT INTO users (display_name, name) VALUES (?,?)",
+        [user.display_name, user.name]
       );
     },
     update: function(user){
