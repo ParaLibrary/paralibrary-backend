@@ -3,37 +3,25 @@ var router = express.Router();
 var db = require("../db.js");
 
 router.route("/")
-  .get(function (req, res) {
-    res.statusCode = 200;
-    res.json({
-      "id": 1,
-      "display_name": "BobJoe",
-      "name": "Robert Joseph"
-    })
-  })
-  .put(function(req, res) {
-    res.statusCode = 200;
-    res.end();
-  })
   .post(function (req, res) {
-    res.statusCode = 200;
-      res.json({
-      "id": 2,
-      "display_name": "Anon421235",
-      "name": "Michael Jackson"
-    })
-  })
-  .delete(function(req, res) {
-    res.statusCode = 200;
-    res.end();
+    let user = req.body;
+    db.users.insert(user).then(([result, fields]) => {
+      if (result.affectedRows === 0) {    // If no rows are affected, send a 404.
+        res.statusCode = 404;
+        res.end();
+        return;
+      }
+       res.statusCode = 200;
+       res.json({ "id": result.insertId })
+    });
   })
 
-router
-  .route("/:id")
+router.route("/:id")
   .get(function (req, res) {
-    db.users.get(req.params.id).then(function (user) {
+    db.users.get(req.params.id).then((user) => {
       if (!user) {
         res.statusCode = 404;
+        res.end()
         return;
       }
       res.statusCode = 200;
@@ -42,24 +30,20 @@ router
   })
   .put(function (req, res) {
     let user = req.body;
-    db.users.insertOrUpdate(user).then((result) => {
-      if (result.something) {
-        // TODO
+    db.users.update(user).then(([result, fields]) => {
+      if (result.affectedRows == 0) {    // If no rows are affected, send a 404.
         res.statusCode = 404;
+        res.end();
         return;
       }
-      res.statusCode = 200;
-    });
+       res.statusCode = 200;
+       res.json({ "id": result.insertId })
+     });
   })
   .delete(function (req, res) {
-    db.users.delete(req.params.id).then(function (user) {
-      // call delete
-      //if (user) {   // if user still exists, send an error code
-      //  res.statusCode = 404;
-      //  return;
-      //}
-      res.statusCode = 200; //
-      //res.json(user);
+    db.users.delete(req.params.id).then((user) => {
+      res.statusCode = 200;
+      res.end()
     });
   });
 

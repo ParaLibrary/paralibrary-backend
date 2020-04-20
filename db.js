@@ -33,10 +33,22 @@ var books = (function () {
           return rows[0];
         });
     },
+    insert: function (book) {
+      return pool.query(
+        "INSERT INTO books (user_id, title, author, isbn, summary, visibility) VALUES (?,?,?,?,?,?)",
+        [book.user_id, book.title, book.author, book.isbn, book.summary, book.visibility] 
+      );
+    },
+    update: function (book) {
+      return pool.query(
+        "UPDATE books SET user_id = ?, title = ?, author = ?, isbn = ?, summary = ?, visibility = ? WHERE id = ?",
+        [book.user_id, book.title, book.author, book.isbn, book.summary, book.visibility, book.id]
+      );
+    },
     delete: function (bookId) {
       return pool.query("DELETE FROM books WHERE id = ?", [bookId]);
     },
-  };
+  }; 
 })();
 
 var users = (function () {
@@ -51,15 +63,20 @@ var users = (function () {
           return rows[0];
         });
     },
-    insertOrUpdate: function (user) {
+    insert: function (user) {
       return pool.query(
-        "INSERT INTO users VALUES (?,?,?) ON DUPLICATE KEY UPDATE display_name = VALUES(display_name)",
-        [user.id, user.display_name, user.name]
+        "INSERT INTO users (display_name, name) VALUES (?,?)",
+        [user.display_name, user.name]
+      );
+    },
+    update: function(user){
+      return pool.query(
+        "UPDATE users SET display_name = ?, name = ? WHERE id = ?",
+        [user.display_name, user.name, user.id]
       );
     },
     delete: function (userId) {
       return pool.query("DELETE FROM users WHERE id = ?", [userId]);
-      //"DROP USER IF EXISTS", [userId]   I had this earlier as well.
     },
   };
 })();
