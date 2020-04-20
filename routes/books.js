@@ -3,19 +3,9 @@ var router = express.Router();
 var db = require('../db.js');
 
 router.route('/')
-  .get(function (req, res) {
-    db.books.get(req.params.id).then((book) => {
-      if (!book) {
-        res.statusCode = 404;
-        return;
-      }
-      res.statusCode = 200;
-      res.json(book);
-    });
-  })
   .post(function(req, res) {
     let book = req.body;
-    db.books.insert(book).then(([result, fields]) =>{
+    db.books.insert(book).then(([result, fields]) => {
       if (result.affectedRows === 0) {    // If no rows are affected, send a 404.
         res.statusCode = 404;
         res.end();
@@ -23,7 +13,6 @@ router.route('/')
       }
        res.statusCode = 200;
        res.json({ "id": result.insertId })
-       res.end();
     });
   })
 
@@ -32,6 +21,7 @@ router.route("/:id")
     db.books.get(req.params.id).then((book) => {
       if(!book) {
         res.statusCode = 404;
+        res.end()
         return;
       }
       res.statusCode = 200;
@@ -40,8 +30,8 @@ router.route("/:id")
   })
   .put(function (req, res) {
     let book = req.body;
-    db.books.update(book).then((result) => {
-      if (result[0].affectedRows === 0) {    // If no rows are affected, send a 404.
+    db.books.update(book).then(([result, fields]) => {
+      if (result.affectedRows === 0) {    // If no rows are affected, send a 404.
         res.statusCode = 404;
         res.end();
         return;

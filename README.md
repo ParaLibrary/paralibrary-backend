@@ -37,9 +37,9 @@ All routes start with `https://paralibrary.digital/api`
  Type | Route | Description 
  ---:| --- | --- 
 `  POST`|`/users`     | Create a new user
-`   GET`|`/users\:id` | Get the current user by his/her id
-`   PUT`|`/users\:id` | Modify the user object by his/her id
-`DELETE`|`/users\:id` | Delete the user oobject by his/her id
+`   GET`|`/users/:id` | Get the current user by his/her id
+`   PUT`|`/users/:id` | Modify the user object by his/her id
+`DELETE`|`/users/:id` | Delete the user oobject by his/her id
 
 ## Categories
 ### The Category Object

@@ -5,8 +5,8 @@ var db = require("../db.js");
 router.route("/")
   .post(function (req, res) {
     let user = req.body;
-    db.users.insert(user).then((result) => {
-      if (result[0].affectedRows === 0) {    // If no rows are affected, send a 404.
+    db.users.insert(user).then(([result, fields]) => {
+      if (result.affectedRows === 0) {    // If no rows are affected, send a 404.
         res.statusCode = 404;
         res.end();
         return;
@@ -21,6 +21,7 @@ router.route("/:id")
     db.users.get(req.params.id).then((user) => {
       if (!user) {
         res.statusCode = 404;
+        res.end()
         return;
       }
       res.statusCode = 200;
@@ -29,8 +30,8 @@ router.route("/:id")
   })
   .put(function (req, res) {
     let user = req.body;
-    db.users.update(user).then((result) => {
-      if (result[0].affectedRows == 0) {    // If no rows are affected, send a 404.
+    db.users.update(user).then(([result, fields]) => {
+      if (result.affectedRows == 0) {    // If no rows are affected, send a 404.
         res.statusCode = 404;
         res.end();
         return;
