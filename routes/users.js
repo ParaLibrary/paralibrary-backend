@@ -2,11 +2,7 @@ var express = require("express");
 var router = express.Router();
 var db = require("../db.js");
 
-router
-  .route("/")
-  .get(function (req, res) {
-    // Get all users
-  })
+router.route("/")
   .post(function (req, res) {
     let user = req.body;
     db.users.insert(user).then((result) => {
@@ -16,14 +12,13 @@ router
         return;
       }
        res.statusCode = 200;
-       return res.json.id;
+       res.json({ "id": result.insertId })
     });
   })
 
-router
-  .route("/:id")
+router.route("/:id")
   .get(function (req, res) {
-    db.users.get(req.params.id).then(function (user) {
+    db.users.get(req.params.id).then((user) => {
       if (!user) {
         res.statusCode = 404;
         return;
@@ -41,12 +36,13 @@ router
         return;
       }
        res.statusCode = 200;
-       res.end();
+       res.json({ "id": result.insertId })
      });
   })
   .delete(function (req, res) {
-    db.users.delete(req.params.id).then(function (user) {
+    db.users.delete(req.params.id).then((user) => {
       res.statusCode = 200;
+      res.end()
     });
   });
 
