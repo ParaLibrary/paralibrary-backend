@@ -79,6 +79,7 @@ status is an ENUM and can be referenced by number (0,1,2) or string name ("reque
 `DELETE`|`/friends/:id`         | Delete a friendships object by its id
 `  POST`|`/friends/:id/request` | Request friendship with the target user
 `  POST`|`/friends/:id/accept`  | Accept friendship request with the target user
+`  POST`|`/friends/:id/reject`  | Reject friendship request with the target user
 
 ## Loans
 ### The Loans Object
