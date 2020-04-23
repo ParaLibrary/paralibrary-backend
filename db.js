@@ -51,6 +51,36 @@ var books = (function () {
   }; 
 })();
 
+var categories = (function () {
+  return {
+    get: function (categoryId) {
+      return pool
+        .query("SELECT * FROM categories WHERE id = ?", [categoryId])
+        .then(([rows, fields]) => {
+          if (!rows || rows.length === 0) {
+            return null;
+          }
+          return rows[0];
+        });
+    },
+    insert: function (category) {
+      return pool.query(
+        "INSERT INTO categories (user_id, name) VALUES (?,?)",
+        [category.user_id, category.name] 
+        );
+    },
+    update: function (category) {
+      return pool.query(
+        "UPDATE categories SET user_id = ?, name = ? WHERE id = ?",
+        [category.user_id, category.name, category.id]
+      );
+    },
+    delete: function (categoryId) {
+      return pool.query("DELETE FROM categories WHERE id = ?", [categoryId]);
+    },
+  };
+})();
+
 var users = (function () {
   return {
     get: function (userId) {
@@ -83,5 +113,6 @@ var users = (function () {
 
 module.exports = {
   books,
+  categories,
   users,
 };
