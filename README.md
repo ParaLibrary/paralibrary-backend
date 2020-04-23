@@ -53,6 +53,7 @@ All routes start with `https://paralibrary.digital/api`
 ### Routes
  Type | Route | Description 
  ---:| --- | --- 
+`   GET`|`/categories`     | Get all the categories for the current user
 `  POST`|`/categories`     | Create a new category
 `   GET`|`/categories/:id` | Get a single category object by its id
 `   PUT`|`/categories/:id` | Modify a category object by its id
