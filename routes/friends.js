@@ -17,6 +17,30 @@ router.route('/')
         "display_name": "Dr. Arias",
         "name": "Carlos Arias",
         "status": "requested"
+      },
+      {
+        "id": 167,
+        "display_name": "NateTheGr8",
+        "name": "Nate",
+        "status": "requested"
+      },
+      {
+        "id": 168,
+        "display_name": "BigBenis",
+        "name": "Ben",
+        "status": "requested"
+      },
+      {
+        "id": 169,
+        "display_name": "Trashimoto",
+        "name": "Trent",
+        "status": "requested"
+      },
+      {
+        "id": 179,
+        "display_name": "Malachi (Tait's Cat)",
+        "name": "Malchi",
+        "status": "accepted"
       }
     ])
   })
@@ -37,7 +61,13 @@ router.route("/:id/request")
     res.end();
   })
 
-router.route("/:id/accept")
+  router.route("/:id/accept")
+  .post(function(req, res) {
+    res.statusCode = 200;
+    res.end();
+  })
+  
+router.route("/:id/reject")
   .post(function(req, res) {
     res.statusCode = 200;
     res.end();
