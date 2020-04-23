@@ -24,8 +24,7 @@ pool
 var books = (function () {
   return {
     get: function (bookId) {
-      return pool
-        .query("SELECT * FROM books WHERE id = ?", [bookId])
+      return pool.query("SELECT * FROM books WHERE id = ?", [bookId])
         .then(([rows, fields]) => {
           if (!rows || rows.length === 0) {
             return null;
@@ -49,6 +48,44 @@ var books = (function () {
       return pool.query("DELETE FROM books WHERE id = ?", [bookId]);
     },
   }; 
+})();
+
+var categories = (function () {
+  return {
+    get: function (categoryId) {
+      return pool.query("SELECT * FROM categories WHERE id = ?", [categoryId])
+        .then(([rows, fields]) => {
+          if (!rows || rows.length === 0) {
+            return null;
+          }
+          return rows[0];
+        });
+    },
+    getAllByUserId: function (category) {
+      return pool.query("SELECT * FROM categories WHERE user_id = ?", [category.user_id])
+        .then(([rows, fields]) => {
+          if (!rows || rows.length === 0) {
+            return null;
+          }
+          return rows[0];
+        });
+    },
+    insert: function (category) {
+      return pool.query(
+        "INSERT INTO categories (user_id, name) VALUES (?,?)",
+        [category.user_id, category.name] 
+      );
+    },
+    update: function (category) {
+      return pool.query(
+        "UPDATE categories SET name = ? WHERE id = ?",
+        [category.name, category.id]
+      );
+    },
+    delete: function (categoryId) {
+      return pool.query("DELETE FROM categories WHERE id = ?", [categoryId]);
+    },
+  };
 })();
 
 var users = (function () {
@@ -83,5 +120,6 @@ var users = (function () {
 
 module.exports = {
   books,
+  categories,
   users,
 };
