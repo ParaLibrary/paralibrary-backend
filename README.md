@@ -12,9 +12,10 @@ All routes start with `https://paralibrary.digital/api`
   "author": "An Author Name",
   "isbn": "1234567890123",
   "summary": "Can be very long",
-  "visibility": false
+  "visibility": "public"
 }
 ```
+Visibility is an ENUM and can be referenced by string name ("public" | "private" | "friends")
 ### Routes
    Type | Route | Description 
   ---:| --- | --- 
@@ -70,7 +71,7 @@ All routes start with `https://paralibrary.digital/api`
 }
 ```
 A friend object is just a user object with an extra property "status" that tells the relationship of the friend to the user.\
-status is an ENUM and can be referenced by number (0,1,2) or string name ("requested" | "waiting" | "friends"). The API will always return the string version.
+status is an ENUM and can be referenced by string name ("requested" | "waiting" | "friends"). The API will always return the string version.
 ### Routes
  Type | Route | Description 
  ---:| --- | --- 
