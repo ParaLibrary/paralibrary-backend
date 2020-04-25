@@ -13,6 +13,7 @@ All routes start with `https://paralibrary.digital/api`
   "isbn": "1234567890123",
   "summary": "Can be very long",
   "visibility": "public"
+  "categories": ["horror", "scifi"]
 }
 ```
 Visibility is an ENUM and can be referenced by string name ("public" | "private" | "friends")
