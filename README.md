@@ -12,7 +12,7 @@ All routes start with `https://paralibrary.digital/api`
   "author": "An Author Name",
   "isbn": "1234567890123",
   "summary": "Can be very long",
-  "visibility": "public"
+  "visibility": "public",
   "categories": ["horror", "scifi"]
 }
 ```
