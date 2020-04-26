@@ -72,7 +72,7 @@ router.route("/:id")
     })
   })
 
-router.route("/:id/request")    // Request a friendship with a target user
+router.route("/:id/status")    // Request a friendship with a target user
   .post(function(req, res) {
     /*db.friends.updateStatusToReq(req.params.id).then((friend) => {  
       return db.friends.updateStatusToWaiting(req.params.id) 
@@ -81,7 +81,7 @@ router.route("/:id/request")    // Request a friendship with a target user
     res.end()                   
     });*/
 
-    let friend = req.body;
+    let friend = req.body;    // The front end will pass in the status as raw json data
 
     if (req.body.status === "requested"){                           // If status === req, update the status
       db.friends.updateStatus(friend).then(([result, fields]) => {  
@@ -108,19 +108,19 @@ router.route("/:id/request")    // Request a friendship with a target user
     else if (req.body.status === "friends"){
       db.friends.updateStatus(friend).then(([result, fields]) => {  
 
-      if (result.affectedRows === 0) {    // If no rows are affected, send a 404.
+      if (result.affectedRows === 0) {    // Same thing as above - if the status equals 'friends', update the status and see if any rows were changed
         res.statusCode = 404;
         res.end();
         return
       }
         res.statusCode = 200;
-        res.json({ "id": result.insertId })
+        res.json({ "id": result.insertId })   
       })
     }
     else if (req.body.status === "rejected"){
       db.friends.delete(friend).then(([result, fields]) => {  
      
-        if (result.affectedRows === 0) {    // If no rows are affected, send a 404.
+        if (result.affectedRows === 0) {    
           res.statusCode = 404;
           res.end();
           return
@@ -132,13 +132,9 @@ router.route("/:id/request")    // Request a friendship with a target user
     else{
       res.end();
     }
-    res.end();
-    //db.friends.insert(friend).then(([result, fields]) => { 
-    //db.friends.updateStatusToRej(req.params.id).then((friend) => {
-    //res.statusCode = 200;
-    //res.end();
-    //})
   })
+
+  /* Since we only have one status route, we don't need these routes.
 
   router.route("/:id/accept")
   .post(function(req, res) {
@@ -155,5 +151,6 @@ router.route("/:id/reject")
   res.end()                     // Would we just call delete here, sicne we don't want to change the field to rejected? 
   });
 })
+*/
 
 module.exports = router;

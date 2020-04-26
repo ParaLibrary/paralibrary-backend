@@ -88,7 +88,6 @@ var categories = (function () {
   };
 })();
 
-
 var friends = (function () {
   return {
     get: function (friendId) {
