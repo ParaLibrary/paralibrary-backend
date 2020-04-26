@@ -112,8 +112,8 @@ var friends = (function () {
     },
     createWaitingRow: function(friend){
       // If the user requests a friendship, a 'waiting' row must also be created.
-    },
-    updateStatusToAcc: function(friend){
+    },  
+    /*updateStatusToAcc: function(friend){
       return pool.query(
         "UPDATE friendships SET status = ? WHERE friend_id = ?",
         [friend.status, friend.id]
@@ -124,16 +124,19 @@ var friends = (function () {
       return pool.query(
         "UPDATE friendships SET status = ? WHERE friend_id = ?",
         ["rejected", friendId]
-
-        
       );
+    },*/
+
+    delete: function (friend) {
+      return pool.query("DELETE FROM friendships WHERE user_id = ?", [friend.id]);
     },
+    /*
     deleteOnUsersEnd: function (friendId) {
       return pool.query("DELETE FROM friendships WHERE user_id = ?", [friendId]);
     },
     deleteFriendsEnd: function (friendId) {
       return pool.query("DELETE FROM friendships WHERE friend_id = ?", [friendId]);
-    },
+    },*/
   };
 })();
 

@@ -96,12 +96,12 @@ router.route("/:id/request")    // Request a friendship with a target user
             }
              res.statusCode = 200;              // If not, then we're good.
              res.json({ "id": result.insertId })// return here w/ res.end(). I don't think we'd need to return result.insertId here.
-          })
+          })  
         }             
         else if (result.affectedRows === 0) {   // If there is an issue updating the status to requested, send a 404    
           res.statusCode = 404;
           res.end();
-          return
+          return 
         }
       })
     }

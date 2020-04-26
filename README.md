@@ -75,7 +75,7 @@ A friend object is just a user object with an extra property "status" that tells
 status is an ENUM and can be referenced by string name ("requested" | "waiting" | "friends"). The API will always return the string version.
 ### Routes
  Type | Route | Description 
- ---:| --- | --- 
+ ---:| --- | ---  
 `   GET`|`/friends`             | Get all the friends for the current user (currently static data)
 `   GET`|`/friends/:id`         | A temproary route that serves non-static data by specifying a certain user in the url
 `   PUT`|`/friends/:id`         | Modify a friendships object by its id
