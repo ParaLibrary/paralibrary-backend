@@ -88,6 +88,55 @@ var categories = (function () {
   };
 })();
 
+
+var friends = (function () {
+  return {
+    get: function (friendId) {
+      return pool.query(
+        "SELECT friend_id, status, display_name, name " + 
+        "FROM friendships JOIN users " +
+        "ON friend_id = id " +
+        "WHERE user_id = ?",
+        [friendId])
+
+        .then(([rows, fields]) => {
+          return rows;
+        }
+      );
+    },
+    updateStatus: function(friend){
+      return pool.query(
+        "UPDATE friendships SET status = ? WHERE friend_id = ?",
+        [friend.status, friend.id]
+      );
+    },
+    createWaitingRow: function(friend){
+      // If the user requests a friendship, a 'waiting' row must also be created.
+    },
+    updateStatusToAcc: function(friend){
+      return pool.query(
+        "UPDATE friendships SET status = ? WHERE friend_id = ?",
+        [friend.status, friend.id]
+        
+      );
+    },
+    updateStatusToRej: function(friendId){
+      return pool.query(
+        "UPDATE friendships SET status = ? WHERE friend_id = ?",
+        ["rejected", friendId]
+
+        
+      );
+    },
+    deleteOnUsersEnd: function (friendId) {
+      return pool.query("DELETE FROM friendships WHERE user_id = ?", [friendId]);
+    },
+    deleteFriendsEnd: function (friendId) {
+      return pool.query("DELETE FROM friendships WHERE friend_id = ?", [friendId]);
+    },
+  };
+})();
+
 var users = (function () {
   return {
     get: function (userId) {
@@ -121,5 +170,6 @@ var users = (function () {
 module.exports = {
   books,
   categories,
+  friends,
   users,
 };

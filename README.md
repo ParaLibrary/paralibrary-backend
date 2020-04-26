@@ -74,7 +74,8 @@ status is an ENUM and can be referenced by number (0,1,2) or string name ("reque
 ### Routes
  Type | Route | Description 
  ---:| --- | --- 
-`   GET`|`/friends`             | Get all the friends for the current user
+`   GET`|`/friends`             | Get all the friends for the current user (currently static data)
+`   GET`|`/friends/:id`         | A temproary route that serves non-static data by specifying a certain user in the url
 `   PUT`|`/friends/:id`         | Modify a friendships object by its id
 `DELETE`|`/friends/:id`         | Delete a friendships object by its id
 `  POST`|`/friends/:id/request` | Request friendship with the target user
