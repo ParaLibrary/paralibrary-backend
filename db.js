@@ -103,39 +103,40 @@ var friends = (function () {
         }
       );
     },
-    updateStatus: function(friend){
+    insertRequestRow: function(friend){   // Will insert a request row for a target user
       return pool.query(
-        "UPDATE friendships SET status = ? WHERE friend_id = ?",
-        [friend.status, friend.id]
+        "INSERT INTO friendships (user_id, friend_id, status) VALUES (?,?,?)",
+        [friend.id - 1 /*Temp value. This should be the user's id*/, friend.id, "requested"] 
       );
     },
-    createWaitingRow: function(friend){
-      // If the user requests a friendship, a 'waiting' row must also be created.
+    insertWaitingRow: function(friend){   // Will insert a waiting row for the user who has been requested
+      return pool.query(
+        "INSERT INTO friendships (user_id, friend_id, status) VALUES (?,?,?)",
+        [friend.id, friend.id - 1 /*Temp value. This should be the user's id*/, "waiting"] 
+      );
     },  
-    /*updateStatusToAcc: function(friend){
+    updateReqRowToAcc: function(friend){  // Will update the target user's status to "accepted"
       return pool.query(
-        "UPDATE friendships SET status = ? WHERE friend_id = ?",
-        [friend.status, friend.id]
-        
+        "UPDATE friendships SET status = ? WHERE user_id = ?",
+        ["friends", friend.id - 1 /*Temp value. This should be the user's id*/] 
       );
     },
-    updateStatusToRej: function(friendId){
-      return pool.query(
+    updateWaitRowToAcc: function(friend){   // Will update the requestee's row to "accepted"
+        return pool.query(
         "UPDATE friendships SET status = ? WHERE friend_id = ?",
-        ["rejected", friendId]
+        ["friends", friend.id - 1 /*Temp value. This should be the user's id*/]  
       );
-    },*/
-
-    delete: function (friend) {
+    },
+    deleteReqRow: function (friend) {   // Will delete the target user's row
       return pool.query("DELETE FROM friendships WHERE user_id = ?", [friend.id]);
     },
-    /*
-    deleteOnUsersEnd: function (friendId) {
-      return pool.query("DELETE FROM friendships WHERE user_id = ?", [friendId]);
+    deleteWaitRow: function (friend) {   // Will delete the requestee's row
+      return pool.query("DELETE FROM friendships WHERE friend_id = ?", [friend.id]);
     },
-    deleteFriendsEnd: function (friendId) {
-      return pool.query("DELETE FROM friendships WHERE friend_id = ?", [friendId]);
-    },*/
+
+    // Quick note: We can tighten up these functions once we get sessions going, since sessions will provide us with 
+    // both the target user's id, and the sender's id. One sql query can be made with those each time instead of two.
+
   };
 })();
 
