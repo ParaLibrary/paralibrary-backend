@@ -1,25 +1,22 @@
-var mysql = require("mysql2/promise");
+var mysql = require("mysql2");
 var config = require("./config/db");
 
-var pool = mysql
-  .createPool({
-    host: config.host,
-    port: config.port,
-    user: config.username,
-    password: config.password,
-    database: config.database,
-    connectionLimit: 5,
-  })
-  //.promise();
+var pool = mysql.createPool({
+  host: config.host,
+  port: config.port,
+  user: config.username,
+  password: config.password,
+  database: config.database,
+  connectionLimit: 5,
+}).promise();
 
-pool
-  .query("SELECT 1+1")
-  .then(() => {
-    console.log("Connected to db");
-  })
-  .catch((e) => {
-    console.error("Can't establish connection to the database\n" + e);
-  });
+pool.query("SELECT 1+1")
+.then(() => {
+  console.log("Connected to db");
+})
+.catch((e) => {
+  console.error("Can't establish connection to the database\n" + e);
+});
 
 var books = (function () {
   return {
@@ -103,36 +100,20 @@ var friends = (function () {
         }
       );
     },
-    insertRequestRow: function(friend){   // Will insert a request row for a target user
-      return pool.query(
-        "INSERT INTO friendships (user_id, friend_id, status) VALUES (?,?,?)",
-        [friend.id - 1 /*Temp value. This should be the user's id*/, friend.id, "requested"] 
-      );
+    update: async function(userId, friendId, userStatus, friendStatus) {
+      const insertUpdate = 'INSERT INTO friendships VALUES (?,?,?) ON DUPLICATE KEY UPDATE status = VALUES(status)';
+      return executeTransaction([
+        mysql.format(insertUpdate, [ userId, friendId, userStatus ]),
+        mysql.format(insertUpdate, [ friendId, userId, friendStatus ])
+      ]);
     },
-    insertWaitingRow: function(friend){   // Will insert a waiting row for the user who has been requested
-      return pool.query(
-        "INSERT INTO friendships (user_id, friend_id, status) VALUES (?,?,?)",
-        [friend.id, friend.id - 1 /*Temp value. This should be the user's id*/, "waiting"] 
-      );
-    },  
-    updateReqRowToAcc: function(friend){  // Will update the target user's status to "friends"
-      return pool.query(
-        "UPDATE friendships SET status = ? WHERE user_id = ?",
-        ["friends", friend.id - 1 /*Temp value. This should be the user's id*/] 
-      );
-    },
-    updateWaitRowToAcc: function(friend){   // Will update the requestee's row to "friends"
-        return pool.query(
-        "UPDATE friendships SET status = ? WHERE friend_id = ?",
-        ["friends", friend.id - 1 /*Temp value. This should be the user's id*/]  
-      );
-    },
-    deleteReqRow: function (friend) {   // Will delete the target user's row
-      return pool.query("DELETE FROM friendships WHERE user_id = ?", [friend.id]);
-    },
-    deleteWaitRow: function (friend) {   // Will delete the requestee's row
-      return pool.query("DELETE FROM friendships WHERE friend_id = ?", [friend.id]);
-    },
+    delete: function (userId, friendId) {   // Will delete the requestee's row
+      const deleteStatement = "DELETE FROM friendships WHERE user_id = ? AND friend_id = ?";
+      return executeTransaction([
+        mysql.format(deleteStatement, [ userId, friendId ]),
+        mysql.format(deleteStatement, [ friendId, userId ])
+      ]);
+    }
 
     // Quick note: We can tighten up these functions once we get sessions going, since sessions will provide us with 
     // both the target user's id, and the sender's id. One sql query can be made with those each time instead of two.
@@ -170,20 +151,37 @@ var users = (function () {
   };
 })();
 
+/**
+ * Executes the array of queries in a transaction to ensure they all happen or none at all
+ * 
+ * @param {String[]} queries - An array of queries to execute
+ * @returns {Promise}
+ */
+async function executeTransaction(queries) {
+  let connection = await pool.getConnection();
+  try {
+    await connection.query('START TRANSACTION');
+    const queryPromises = []
+
+    queries.forEach((query) => {
+        queryPromises.push(connection.query(query))
+    })
+    const results = await Promise.all(queryPromises)
+
+    await connection.commit();
+    await connection.release();
+    return results;
+  }
+  catch(error) {
+    await connection.query('ROLLBACK');
+    await connection.release();
+    return Promise.reject(err)
+  }
+}
+
 module.exports = {
   books,
   categories,
   friends,
-  users,
-
-  getConnection: function () {
-    return mysql.createPool({
-      host: config.host,
-      port: config.port,
-      user: config.username,
-      password: config.password,
-      database: config.database,
-      connectionLimit: 5,
-    });
-}
+  users
 };

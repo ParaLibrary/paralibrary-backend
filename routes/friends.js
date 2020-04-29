@@ -59,64 +59,43 @@ router.route("/:id")
     res.json(friend);
   })
 }) 
-.post( async function(req, res) {
+.post(function(req, res) {
+  res.statusCode = 200;
 
   let friend = req.body;    // The front end will pass in the status as raw json data
-
-  if (req.body.status === "requested"){   
-                            // If status === req, update the status
-  }
-  else if (req.body.status === "accepted"){
-
-    const connection = await db.getConnection();
-    try {
-      await connection.query("START TRANSACTION");
-          
-      await connection.query("UPDATE friendships SET status = ? WHERE user_id = ?",
-                 ["friends", friend.id]); 
-
-      await connection.query("UPDATE friendships SET status = ? WHERE friend_id = ?",
-                 ["friends", friend.id]);   
-
-      await connection.query('COMMIT');
-     // await connection.release();
-    } 
-    catch(e) {
-      connection.query('ROLLBACK');
-      //await connection.release();
-      res.statusCode = 404
-      res.end()
-    }
-
-      res.statusCode = 200;              
-      res.end()
-  }
-  else if (req.body.status === "rejected"){
-    db.friends.deleteReqRow(friend).then(([result, fields]) => {   // Delete the target user's row
-
-      if (result.affectedRows === 1) {                            
-        db.friends.deleteWaitRow(friend).then(([result, fields]) => {   // Delete the requestee's row
-
-          if (result.affectedRows === 0) {   // If an error occurs, send a 404
-            res.statusCode = 404;
-            res.end();
-            return
-          }
-            res.statusCode = 200;              // If not, then we're good 
-            res.end()
-        })  
-      }  
-      else if (result.affectedRows === 0) {    
-        res.statusCode = 404;
-        res.end();
-        return
-      }  
-    })
-  }
-  else {   // If this case is hit, that means the json status was not any of the specified values (requested, accepted, rejected).
+  if(!friend || !friend.status || req.params.id != friend.id) {
     res.statusCode = 404;
     res.end();
+    return;
   }
+
+  switch(friend.status) {
+    case "requested":
+      db.friends.update(1, friend.id, "requested", "waiting")
+      .catch(error => {
+        res.body = error;
+        res.statusCode = 404;
+      });
+      break;
+    case "accepted":
+      db.friends.update(1, friend.id, "friends", "friends")
+      .catch(error => {
+        res.body = error;
+        res.statusCode = 404;
+      });
+      break;
+    case "rejected":
+      db.friends.delete(1, friend.id)
+      .catch(error => {
+        res.body = error;
+        res.statusCode = 404;
+      });
+      break;
+    default:
+      res.statusCode = 404;
+  }
+
+  res.end();
 })
 
 module.exports = router;
