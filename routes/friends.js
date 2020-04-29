@@ -2,6 +2,8 @@ var express = require("express");
 var router = express.Router();
 var db = require('../db.js');
 
+
+
 router.route('/')
   .get(function(req, res) {
     res.statusCode = 200;
@@ -56,53 +58,38 @@ router.route("/:id")
     res.statusCode = 200;
     res.json(friend);
   })
-})
-.post(function(req, res) {
+}) 
+.post( async function(req, res) {
 
   let friend = req.body;    // The front end will pass in the status as raw json data
 
-  if (req.body.status === "requested"){                           // If status === req, update the status
-    db.friends.insertRequestRow(friend).then(([result, fields]) => {  
-
-      if (result.affectedRows === 1) {                            // If the status was updated successfully, insert the waiting row. 
-        db.friends.insertWaitingRow(friend).then(([result, fields]) => { 
-
-          if (result.affectedRows === 0) {   // If there is an issue inserting the waiting row, send a 404
-            res.statusCode = 404;
-            res.end();
-            return
-          }
-           res.statusCode = 200;              // If not, then we're good 
-           res.end()
-        })  
-      }             
-      else if (result.affectedRows === 0) {   // If there is an issue updating the status to requested, send a 404    
-        res.statusCode = 404;
-        res.end();
-        return 
-      }
-    })    }
+  if (req.body.status === "requested"){   
+                            // If status === req, update the status
+  }
   else if (req.body.status === "accepted"){
-    db.friends.updateReqRowToAcc(friend).then(([result, fields]) => {  
 
-      if (result.affectedRows === 1) {                            // If the status was updated successfully, insert the waiting row. 
-        db.friends.updateWaitRowToAcc(friend).then(([result, fields]) => { 
+    const connection = await db.getConnection();
+    try {
+      await connection.query("START TRANSACTION");
+          
+      await connection.query("UPDATE friendships SET status = ? WHERE user_id = ?",
+                 ["friends", friend.id]); 
 
-          if (result.affectedRows === 0) {   // If there is an issue inserting the waiting row, send a 404
-            res.statusCode = 404;
-            res.end();
-            return
-          }
-            res.statusCode = 200;              // If not, then we're good 
-            res.end()
-        })  
-      }  
-      else if (result.affectedRows === 0) {    // Same thing as above - if the status equals 'friends', update the status and see if any rows were changed
-        res.statusCode = 404;
-        res.end();
-        return
-      }  
-    })
+      await connection.query("UPDATE friendships SET status = ? WHERE friend_id = ?",
+                 ["friends", friend.id]);   
+
+      await connection.query('COMMIT');
+     // await connection.release();
+    } 
+    catch(e) {
+      connection.query('ROLLBACK');
+      //await connection.release();
+      res.statusCode = 404
+      res.end()
+    }
+
+      res.statusCode = 200;              
+      res.end()
   }
   else if (req.body.status === "rejected"){
     db.friends.deleteReqRow(friend).then(([result, fields]) => {   // Delete the target user's row
@@ -126,7 +113,7 @@ router.route("/:id")
       }  
     })
   }
-  else{   // If this case is hit, that means the json status was not any of the specified values (requested, accepted, rejected).
+  else {   // If this case is hit, that means the json status was not any of the specified values (requested, accepted, rejected).
     res.statusCode = 404;
     res.end();
   }

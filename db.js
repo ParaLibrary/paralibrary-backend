@@ -1,4 +1,4 @@
-var mysql = require("mysql2");
+var mysql = require("mysql2/promise");
 var config = require("./config/db");
 
 var pool = mysql
@@ -10,7 +10,7 @@ var pool = mysql
     database: config.database,
     connectionLimit: 5,
   })
-  .promise();
+  //.promise();
 
 pool
   .query("SELECT 1+1")
@@ -115,13 +115,13 @@ var friends = (function () {
         [friend.id, friend.id - 1 /*Temp value. This should be the user's id*/, "waiting"] 
       );
     },  
-    updateReqRowToAcc: function(friend){  // Will update the target user's status to "accepted"
+    updateReqRowToAcc: function(friend){  // Will update the target user's status to "friends"
       return pool.query(
         "UPDATE friendships SET status = ? WHERE user_id = ?",
         ["friends", friend.id - 1 /*Temp value. This should be the user's id*/] 
       );
     },
-    updateWaitRowToAcc: function(friend){   // Will update the requestee's row to "accepted"
+    updateWaitRowToAcc: function(friend){   // Will update the requestee's row to "friends"
         return pool.query(
         "UPDATE friendships SET status = ? WHERE friend_id = ?",
         ["friends", friend.id - 1 /*Temp value. This should be the user's id*/]  
@@ -175,4 +175,15 @@ module.exports = {
   categories,
   friends,
   users,
+
+  getConnection: function () {
+    return mysql.createPool({
+      host: config.host,
+      port: config.port,
+      user: config.username,
+      password: config.password,
+      database: config.database,
+      connectionLimit: 5,
+    });
+}
 };
