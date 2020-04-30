@@ -30,19 +30,22 @@ var books = (function () {
         });
     },
     insert: function (book) {
-      return pool.query(
-        "INSERT INTO books (user_id, title, author, isbn, summary, visibility) VALUES (?,?,?,?,?,?)",
-        [book.user_id, book.title, book.author, book.isbn, book.summary, book.visibility] 
-      );
+      var sql = "INSERT INTO books (user_id, title, author, isbn, summary, visibility) VALUES (?,?,?,?,?,?)";
+      var inserts = [book.user_id, book.title, book.author, book.isbn, book.summary, book.visibility];
+      sql = mysql.format(sql, inserts);
+      return pool.query(sql);
     },
     update: function (book) {
-      return pool.query(
-        "UPDATE books SET user_id = ?, title = ?, author = ?, isbn = ?, summary = ?, visibility = ? WHERE id = ?",
-        [book.user_id, book.title, book.author, book.isbn, book.summary, book.visibility, book.id]
-      );
+      var sql = "UPDATE books SET user_id = ?, title = ?, author = ?, isbn = ?, summary = ?, visibility = ? WHERE id = ?";
+      var inserts = [book.user_id, book.title, book.author, book.isbn, book.summary, book.visibility, book.id];
+      sql = mysql.format(sql, inserts);
+      return pool.query(sql);
     },
     delete: function (bookId) {
-      return pool.query("DELETE FROM books WHERE id = ?", [bookId]);
+      var sql = "DELETE from books WHERE id = ?";
+      var inserts = [bookId];
+      sql = mysql.format(sql, inserts);
+      return pool.query(sql);
     },
   }; 
 })();
