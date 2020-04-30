@@ -76,13 +76,29 @@ status is an ENUM and can be referenced by string name ("requested" | "waiting" 
 ### Routes
  Type | Route | Description 
  ---:| --- | ---  
-`   GET`|`/friends`             | Get all the friends for the current user (currently static data)
-`   GET`|`/friends/:id`         | A temproary route that serves non-static data by specifying a certain user in the url
-`   PUT`|`/friends/:id`         | Modify a friendships object by its id
-`DELETE`|`/friends/:id`         | Delete a friendships object by its id
-`  POST`|`/friends/:id/request` | Request friendship with the target user
-`  POST`|`/friends/:id/accept`  | Accept friendship request with the target user
-`  POST`|`/friends/:id/reject`  | Reject friendship request with the target user
+`   GET`|`/friends`        | Get all the friends for the current user (currently static data)
+`   GET`|`/friends/:id`    | A temp route that serves real data by specifying a certain user in the url (gets said user's friends). 
+`  POST`|`/friends/:id/`   | Depending on the status passed in, will request/accept/reject a friendship. 
+                             
+As a note to front end - to req/acc/rej a friendship using the POST request, one must pass in the status and the target user as a json object. 
+
+One example of this is:
+{
+  "id": 1,
+  "status": "requested"
+}
+
+Another would be:
+{
+  "id": 9001,
+  "accepted"
+}
+
+And the last would be:
+{
+  "id": 42,
+  "rejected"
+}
 
 ## Loans
 ### The Loans Object

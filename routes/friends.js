@@ -2,6 +2,8 @@ var express = require("express");
 var router = express.Router();
 var db = require('../db.js');
 
+
+
 router.route('/')
   .get(function(req, res) {
     res.statusCode = 200;
@@ -44,14 +46,6 @@ router.route('/')
       }
     ])
   })
-/*
-`   GET`|`/friends`               | Get all the friends for the current user         |    Currently static
-`DELETE`|`/friends/:id`           | Delete a friendships object by its id            |    Done
-`  POST`|`/friends/:id/request`   | Request friendship with the target user          |    wip
-`  POST`|`/friends/:id/accept`    | Accept friendship request with the target user   |    wip
-`  POST`|`/friends/:id/reject`    | Reject friendship request with the target user   |    wip
-*/
-
 
 router.route("/:id")
 .get(function (req, res) {
@@ -64,93 +58,44 @@ router.route("/:id")
     res.statusCode = 200;
     res.json(friend);
   })
-})
-  .delete(function (req, res) {
-    db.friends.delete(req.params.id).then((friend) => {   // TODO: This will work, but only delete one of the two rows of the corresponding friendship
-      res.statusCode = 200;                               //       Once sessions are running, we can be able to delete the other row.
-      res.end();
-    })
-  })
-
-router.route("/:id/status")    // Request a friendship with a target user
-  .post(function(req, res) {
-    /*db.friends.updateStatusToReq(req.params.id).then((friend) => {  
-      return db.friends.updateStatusToWaiting(req.params.id) 
-    }).then((friend) => {
-    res.statusCode = 200; 
-    res.end()                   
-    });*/
-
-    let friend = req.body;    // The front end will pass in the status as raw json data
-
-    if (req.body.status === "requested"){                           // If status === req, update the status
-      db.friends.updateStatus(friend).then(([result, fields]) => {  
-
-        if (result.affectedRows === 1) {                            // If the status was updated successfully, insert the waiting row. 
-          db.friends.insertWaitingRow(friend).then(([result, fields]) => { 
-
-            if (result.affectedRows === 0) {   // If there is an issue inserting the waiting row, send a 404
-             res.statusCode = 404;
-             res.end();
-             return
-            }
-             res.statusCode = 200;              // If not, then we're good.
-             res.json({ "id": result.insertId })// return here w/ res.end(). I don't think we'd need to return result.insertId here.
-          })  
-        }             
-        else if (result.affectedRows === 0) {   // If there is an issue updating the status to requested, send a 404    
-          res.statusCode = 404;
-          res.end();
-          return 
-        }
-      })
-    }
-    else if (req.body.status === "friends"){
-      db.friends.updateStatus(friend).then(([result, fields]) => {  
-
-      if (result.affectedRows === 0) {    // Same thing as above - if the status equals 'friends', update the status and see if any rows were changed
-        res.statusCode = 404;
-        res.end();
-        return
-      }
-        res.statusCode = 200;
-        res.json({ "id": result.insertId })   
-      })
-    }
-    else if (req.body.status === "rejected"){
-      db.friends.delete(friend).then(([result, fields]) => {  
-     
-        if (result.affectedRows === 0) {    
-          res.statusCode = 404;
-          res.end();
-          return
-        }
-          res.statusCode = 200;
-          res.json({ "id": result.insertId })
-       })
-      }
-    else{
-      res.end();
-    }
-  })
-
-  /* Since we only have one status route, we don't need these routes.
-
-  router.route("/:id/accept")
-  .post(function(req, res) {
-    db.friends.updateStatusToAcc(req.params.id).then((friend) => {   
-    res.statusCode = 200; 
-    res.end()                   // Now that a target user's status is friends, how do we delete the row that says waiting?
-    });
-  })
-  
-router.route("/:id/reject")
+}) 
 .post(function(req, res) {
-  db.friends.updateStatusToRej(req.params.id).then((friend) => {   
-  res.statusCode = 200; 
-  res.end()                     // Would we just call delete here, sicne we don't want to change the field to rejected? 
-  });
+  res.statusCode = 200;
+
+  let friend = req.body;    // The front end will pass in the status as raw json data
+  if(!friend || !friend.status || req.params.id != friend.id) {
+    res.statusCode = 404;
+    res.end();
+    return;
+  }
+
+  switch(friend.status) {
+    case "requested":
+      db.friends.update(1, friend.id, "requested", "waiting")
+      .catch(error => {
+        res.body = error;
+        res.statusCode = 404;
+      });
+      break;
+    case "accepted":
+      db.friends.update(1, friend.id, "friends", "friends")
+      .catch(error => {
+        res.body = error;
+        res.statusCode = 404;
+      });
+      break;
+    case "rejected":
+      db.friends.delete(1, friend.id)
+      .catch(error => {
+        res.body = error;
+        res.statusCode = 404;
+      });
+      break;
+    default:
+      res.statusCode = 404;
+  }
+
+  res.end();
 })
-*/
 
 module.exports = router;
