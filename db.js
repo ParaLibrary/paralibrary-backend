@@ -21,7 +21,11 @@ pool.query("SELECT 1+1")
 var books = (function () {
   return {
     get: function (bookId) {
-      return pool.query("SELECT * FROM books WHERE id = ?", [bookId])
+      var sql = "SELECT * FROM books WHERE id = ?";
+      var inserts = [bookId];
+      sql = mysql.format(sql, inserts);
+
+      return pool.query(sql)
         .then(([rows, fields]) => {
           if (!rows || rows.length === 0) {
             return null;
@@ -33,18 +37,21 @@ var books = (function () {
       var sql = "INSERT INTO books (user_id, title, author, isbn, summary, visibility) VALUES (?,?,?,?,?,?)";
       var inserts = [book.user_id, book.title, book.author, book.isbn, book.summary, book.visibility];
       sql = mysql.format(sql, inserts);
+
       return pool.query(sql);
     },
     update: function (book) {
       var sql = "UPDATE books SET user_id = ?, title = ?, author = ?, isbn = ?, summary = ?, visibility = ? WHERE id = ?";
       var inserts = [book.user_id, book.title, book.author, book.isbn, book.summary, book.visibility, book.id];
       sql = mysql.format(sql, inserts);
+
       return pool.query(sql);
     },
     delete: function (bookId) {
       var sql = "DELETE from books WHERE id = ?";
       var inserts = [bookId];
       sql = mysql.format(sql, inserts);
+
       return pool.query(sql);
     },
   }; 
@@ -53,7 +60,11 @@ var books = (function () {
 var categories = (function () {
   return {
     get: function (categoryId) {
-      return pool.query("SELECT * FROM categories WHERE id = ?", [categoryId])
+      var sql = "SELECT * FROM categories WHERE id = ?";
+      var inserts = [categoryId];
+      sql = mysql.format(sql, inserts);
+
+      return pool.query(sql)
         .then(([rows, fields]) => {
           if (!rows || rows.length === 0) {
             return null;
@@ -62,7 +73,11 @@ var categories = (function () {
         });
     },
     getAllByUserId: function (category) {
-      return pool.query("SELECT * FROM categories WHERE user_id = ?", [category.user_id])
+      var sql = "SELECT * FROM categories WHERE id = ?";
+      var inserts = [category.user_id];
+      sql = mysql.format(sql, inserts);
+
+      return pool.query(sql)
         .then(([rows, fields]) => {
           if (!rows || rows.length === 0) {
             return null;
@@ -71,19 +86,25 @@ var categories = (function () {
         });
     },
     insert: function (category) {
-      return pool.query(
-        "INSERT INTO categories (user_id, name) VALUES (?,?)",
-        [category.user_id, category.name] 
-      );
+      var sql = "INSERT INTO categories (user_id, name) VALUES (?,?)";
+      var inserts = [[category.user_id, category.name]];
+      sql = mysql.format(sql, inserts);
+
+      return pool.query(sql);
     },
     update: function (category) {
-      return pool.query(
-        "UPDATE categories SET name = ? WHERE id = ?",
-        [category.name, category.id]
-      );
+      var sql = "UPDATE categories SET name = ? WHERE id = ?";
+      var inserts = [category.name, category.id];
+      sql = mysql.format(sql, inserts);
+
+      return pool.query(sql);
     },
     delete: function (categoryId) {
-      return pool.query("DELETE FROM categories WHERE id = ?", [categoryId]);
+      var sql = "DELETE FROM categories WHERE id = ?";
+      var inserts = [categoryId];
+      sql = mysql.format(sql, inserts);
+
+      return pool.query(sql);
     },
   };
 })();
@@ -91,13 +112,15 @@ var categories = (function () {
 var friends = (function () {
   return {
     get: function (friendId) {
-      return pool.query(
-        "SELECT friend_id, status, display_name, name " + 
-        "FROM friendships JOIN users " +
-        "ON friend_id = id " +
-        "WHERE user_id = ?",
-        [friendId])
 
+      var sql =  "SELECT friend_id, status, display_name, name " + 
+                  "FROM friendships JOIN users " +
+                  "ON friend_id = id " +
+                  "WHERE user_id = ?";
+      var inserts = [friendId];
+      sql = mysql.format(sql, inserts);
+      
+      return pool.query(sql)
         .then(([rows, fields]) => {
           return rows;
         }
@@ -127,8 +150,11 @@ var friends = (function () {
 var users = (function () {
   return {
     get: function (userId) {
-      return pool
-        .query("SELECT * FROM users WHERE id = ?", [userId])
+      var sql = "SELECT * FROM users WHERE id = ?";
+      var inserts = [userId];
+      sql = mysql.format(sql, inserts);
+
+      return pool.query(sql)
         .then(([rows, fields]) => {
           if (!rows || rows.length === 0) {
             return null;
@@ -137,19 +163,25 @@ var users = (function () {
         });
     },
     insert: function (user) {
-      return pool.query(
-        "INSERT INTO users (display_name, name) VALUES (?,?)",
-        [user.display_name, user.name]
-      );
+      var sql = "INSERT INTO users (display_name, name) VALUES (?,?)";
+      var inserts = [user.display_name, user.name];
+      sql = mysql.format(sql, inserts);
+
+      return pool.query(sql);
     },
     update: function(user){
-      return pool.query(
-        "UPDATE users SET display_name = ?, name = ? WHERE id = ?",
-        [user.display_name, user.name, user.id]
-      );
+      var sql = "UPDATE users SET display_name = ?, name = ? WHERE id = ?";
+      var inserts = [user.display_name, user.name, user.id];
+      sql = mysql.format(sql, inserts);
+
+      return pool.query(sql);
     },
     delete: function (userId) {
-      return pool.query("DELETE FROM users WHERE id = ?", [userId]);
+      var sql = "DELETE FROM users WHERE id = ?";
+      var inserts = [userId];
+      sql = mysql.format(sql, inserts);
+
+      return pool.query(sql);
     },
   };
 })();
