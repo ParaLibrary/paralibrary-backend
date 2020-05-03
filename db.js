@@ -89,7 +89,7 @@ var friends = (function () {
   return {
     get: function (friendId) {
       return pool.query(
-        "SELECT friend_id, status, display_name, name " + 
+        "SELECT friend_id, status, name " + 
         "FROM friendships JOIN users " +
         "ON friend_id = id " +
         "WHERE user_id = ?",
@@ -135,14 +135,14 @@ var users = (function () {
     },
     insert: function (user) {
       return pool.query(
-        "INSERT INTO users (display_name, name) VALUES (?,?)",
-        [user.display_name, user.name]
+        "INSERT INTO users (name) VALUES (?,?)",
+        [user.name]
       );
     },
     update: function(user){
       return pool.query(
-        "UPDATE users SET display_name = ?, name = ? WHERE id = ?",
-        [user.display_name, user.name, user.id]
+        "UPDATE users SET name = ? WHERE id = ?",
+        [user.name, user.id]
       );
     },
     delete: function (userId) {
