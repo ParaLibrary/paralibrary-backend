@@ -2,7 +2,7 @@
 The API for the ParaLibrary application\
 All routes start with `https://paralibrary.digital/api`
 
-## Books
+## ---------- Books ---------- ##
 ### The Book object
 ```json
 {
@@ -26,7 +26,7 @@ Visibility is an ENUM and can be referenced by string name ("public" | "private"
 `   PUT`|` /books/:id` | Modify a book object by its id
 `DELETE`|` /books/:id` | Delete a book object by its id
 
-## Users
+## ---------- Users ---------- ##
 ### The User Object
 ```json
 {
@@ -43,7 +43,7 @@ Visibility is an ENUM and can be referenced by string name ("public" | "private"
 `   PUT`|`/users/:id` | Modify the user object by his/her id
 `DELETE`|`/users/:id` | Delete the user oobject by his/her id
 
-## Categories
+## ---------- Categories ---------- ##
 ### The Category Object
 ```json
 {
@@ -61,7 +61,7 @@ Visibility is an ENUM and can be referenced by string name ("public" | "private"
 `   PUT`|`/categories/:id` | Modify a category object by its id
 `DELETE`|`/categories/:id` | Delete a category object by its id
 
-## Friends
+## ---------- Friends ---------- ##
 ### A Friend Object
 ```json
 {
@@ -100,7 +100,7 @@ And the last would be:
   "rejected"
 }
 
-## Loans
+## ---------- Loans ---------- ##
 ### The Loans Object
 ```json
 {

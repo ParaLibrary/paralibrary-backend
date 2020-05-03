@@ -112,8 +112,7 @@ var categories = (function () {
 var friends = (function () {
   return {
     get: function (friendId) {
-
-      var sql =  "SELECT friend_id, status, display_name, name " + 
+      var sql =  "SELECT friend_id, status, name " + 
                   "FROM friendships JOIN users " +
                   "ON friend_id = id " +
                   "WHERE user_id = ?";
@@ -163,15 +162,15 @@ var users = (function () {
         });
     },
     insert: function (user) {
-      var sql = "INSERT INTO users (display_name, name) VALUES (?,?)";
-      var inserts = [user.display_name, user.name];
+      var sql = "INSERT INTO users (name) VALUES (?,?)";
+      var inserts = [user.name];
       sql = mysql.format(sql, inserts);
 
       return pool.query(sql);
     },
     update: function(user){
-      var sql = "UPDATE users SET display_name = ?, name = ? WHERE id = ?";
-      var inserts = [user.display_name, user.name, user.id];
+      var sql = "UPDATE users SET name = ? WHERE id = ?";
+      var inserts = [user.name, user.id];
       sql = mysql.format(sql, inserts);
 
       return pool.query(sql);
