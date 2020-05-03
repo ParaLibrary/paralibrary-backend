@@ -2,7 +2,7 @@
 The API for the ParaLibrary application\
 All routes start with `https://paralibrary.digital/api`
 
-## Books
+## ---------- Books ---------- ##
 ### The Book object
 ```json
 {
@@ -26,24 +26,24 @@ Visibility is an ENUM and can be referenced by string name ("public" | "private"
 `   PUT`|` /books/:id` | Modify a book object by its id
 `DELETE`|` /books/:id` | Delete a book object by its id
 
-## Users
+## ---------- Users ---------- ##
 ### The User Object
 ```json
 {
   "id": 123,
-  "display_name": "Up to 255 chars",
   "name": "Up to 255 chars"
 }
 ```
 ### Routes
  Type | Route | Description 
  ---:| --- | --- 
-`  POST`|`/users`     | Create a new user
-`   GET`|`/users/:id` | Get the current user by his/her id
-`   PUT`|`/users/:id` | Modify the user object by his/her id
-`DELETE`|`/users/:id` | Delete the user oobject by his/her id
+`  POST`|`/users`     | Create a new user                       |   Requires full json object
+`  GET` |`/users`     | Gets a user by his/her name             |   Requires "name" json data
+`   GET`|`/users/:id` | Get the current user by his/her id      |   Does not need json data, only an id number in the URL
+`   PUT`|`/users/:id` | Modify the user object by his/her id.   |   Requires "name" json data
+`DELETE`|`/users/:id` | Delete the user object by his/her id    |   Does not need json data, only an id number in the URL
 
-## Categories
+## ---------- Categories ---------- ##
 ### The Category Object
 ```json
 {
@@ -61,7 +61,7 @@ Visibility is an ENUM and can be referenced by string name ("public" | "private"
 `   PUT`|`/categories/:id` | Modify a category object by its id
 `DELETE`|`/categories/:id` | Delete a category object by its id
 
-## Friends
+## ---------- Friends ---------- ##
 ### A Friend Object
 ```json
 {
@@ -100,7 +100,7 @@ And the last would be:
   "rejected"
 }
 
-## Loans
+## ---------- Loans ---------- ##
 ### The Loans Object
 ```json
 {

@@ -149,7 +149,20 @@ var friends = (function () {
 
 var users = (function () {
   return {
-    get: function (userId) {
+    getUserByName: function (user) {
+      var sql = "SELECT * FROM users WHERE name = ?";
+      var inserts = [user.name];
+      sql = mysql.format(sql, inserts);
+
+      return pool.query(sql)
+        .then(([rows, fields]) => {
+          if (!rows || rows.length === 0) {
+            return null;
+          }
+          return rows[0];
+        });
+    },
+    getUserById: function (userId) {
       var sql = "SELECT * FROM users WHERE id = ?";
       var inserts = [userId];
       sql = mysql.format(sql, inserts);
