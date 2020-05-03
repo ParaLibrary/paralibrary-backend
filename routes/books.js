@@ -31,7 +31,7 @@ router.route("/:id")
   .put(function (req, res) {
     let book = req.body;
     db.books.update(book).then(([result, fields]) => {
-      if (result.affectedRows === 0) {    // If no rows are affected, send a 404.
+      if (result.affectedRows === 0) {    
         res.statusCode = 404;
         res.end();
         return;
