@@ -9,7 +9,7 @@ app.use(bodyParser.json());
 
 var port = process.env.PORT || 8080; // set our port
 
-var bookRoutes = require("./routes/books");
+var libraryRoutes = require("./routes/libraries");
 var categoryRoutes = require("./routes/categories");
 var friendRoutes = require("./routes/friends");
 var loanRoutes = require("./routes/loans");
@@ -21,7 +21,7 @@ router
     console.log("Something is happening.");
     next();
   })
-  .use("/books", bookRoutes)
+  .use("/libraries", libraryRoutes)
   .use("/categories", categoryRoutes)
   .use("/friends", friendRoutes)
   .use("/loans", loanRoutes)
