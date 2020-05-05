@@ -28,6 +28,19 @@ router.route("/")
     });
   })
 
+router.route("/:name")
+.get(function (req, res) {
+  db.users.getUserByName(req.params.name).then((user) => {
+    if (!user) {
+      res.statusCode = 404;
+      res.end()
+      return;
+    }
+    res.statusCode = 200;
+    res.json(user);
+  });
+})
+
 router.route("/:id")
   .get(function (req, res) {
     db.users.getUserById(req.params.id).then((user) => {
