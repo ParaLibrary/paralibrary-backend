@@ -14,6 +14,7 @@ var categoryRoutes = require("./routes/categories");
 var friendRoutes = require("./routes/friends");
 var loanRoutes = require("./routes/loans");
 var userRoutes = require("./routes/users");
+var loginRoutes = require("./routes/login");
 
 var router = express.Router();
 router
@@ -25,7 +26,8 @@ router
   .use("/categories", categoryRoutes)
   .use("/friends", friendRoutes)
   .use("/loans", loanRoutes)
-  .use("/users", userRoutes);
+  .use("/users", userRoutes)
+  .use("/login", loginRoutes);
 
 // Routes start with /api
 app.use("/api", router);
