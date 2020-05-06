@@ -1,13 +1,37 @@
-var express = require("express");
-var app = express();
-var bodyParser = require("body-parser");
+require("dotenv").config();
+const express = require("express");
+const bodyParser = require("body-parser");
+const db = require("./db");
+const session = require("express-session");
+const MySQLStore = require("express-mysql-session")(session);
 
-// configure app to use bodyParser()
-// this will let us get the data from a POST
-app.use(bodyParser.urlencoded({ extended: true }));
+const port = process.env.PORT || 8080;
+const sessionStore = new MySQLStore({}, db.pool);
+
+const app = express();
+
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    store: sessionStore,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      maxAge: 1000 * 60 * 3,
+    },
+  })
+);
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
-var port = process.env.PORT || 8080; // set our port
+const routeProtection = (req, res, next) => {
+  if (req.session.userId == null) {
+    // Unauthorized
+    return res.status(403).end();
+  }
+  next();
+};
 
 var bookRoutes = require("./routes/books");
 var categoryRoutes = require("./routes/categories");
@@ -19,14 +43,22 @@ var loginRoutes = require("./routes/login");
 var router = express.Router();
 router
   .use("/", function (req, res, next) {
-    console.log("Something is happening.");
+    if (process.env.NODE_ENV === "development") {
+      console.log("Something is happening.");
+      res.header("Access-Control-Allow-Origin", "http://localhost:3000");
+      res.header(
+        "Access-Control-Allow-Headers",
+        "Origin, X-Requested-With, Content-Type, Accept"
+      );
+    }
+    res.header("Access-Control-Allow-Credentials", true);
     next();
   })
-  .use("/books", bookRoutes)
-  .use("/categories", categoryRoutes)
-  .use("/friends", friendRoutes)
-  .use("/loans", loanRoutes)
-  .use("/users", userRoutes)
+  .use("/books", routeProtection, bookRoutes)
+  .use("/categories", routeProtection, categoryRoutes)
+  .use("/friends", routeProtection, friendRoutes)
+  .use("/loans", routeProtection, loanRoutes)
+  .use("/users", routeProtection, userRoutes)
   .use("/login", loginRoutes);
 
 // Routes start with /api
