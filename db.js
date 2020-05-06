@@ -151,13 +151,10 @@ var users = (function () {
   return {
     getUserByName: function (userName) {
       var expr = "'" + userName + "%'";
-      var sql = "SELECT * FROM users WHERE name LIKE " + expr;
+      var sql = `SELECT * FROM users WHERE name LIKE '${userName}%'`;
 
       return pool.query(sql)
         .then(([rows, fields]) => {
-          if (!rows || rows.length === 0) {
-            return null;
-          }
           return rows;
         });
     },

@@ -36,7 +36,7 @@ Visibility is an ENUM and can be referenced by string name ("public" | "private"
 ```
 ### Routes
  Type | Route | Description | Required Data
- ---:| --- | --- 
+ ---:| --- | --- | ---
 `  POST`|`/users`        | Create a new user                       |   Requires complete json object
 `  GET` |`/users/:name`  | Gets a user by his/her name             |   Does not need json data, only an name in the URL
 `   GET`|`/users/:id`    | Get the current user by his/her id      |   Does not need json data, only an id number in the URL
