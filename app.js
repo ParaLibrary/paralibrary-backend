@@ -54,11 +54,11 @@ router
     res.header("Access-Control-Allow-Credentials", true);
     next();
   })
-  .use("/libraries", libraryRoutes)
-  .use("/categories", categoryRoutes)
-  .use("/friends", friendRoutes)
-  .use("/loans", loanRoutes)
-  .use("/users", userRoutes)
+  .use("/libraries", routeProtection, libraryRoutes)
+  .use("/categories", routeProtection, categoryRoutes)
+  .use("/friends", routeProtection, friendRoutes)
+  .use("/loans", routeProtection, loanRoutes)
+  .use("/users", routeProtection, userRoutes)
   .use("/login", loginRoutes);
 
 // Routes start with /api
