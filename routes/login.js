@@ -28,8 +28,12 @@ router.route("/").post((req, res) => {
           .then((userId) => {
             // Store only the userId in the session
             req.session.userId = userId;
+            res.json({ userId: userId });
             res.end();
           });
+      } else {
+        res.json({ userId: req.session.userId });
+        res.end();
       }
     })
     .catch((error) => {

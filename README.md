@@ -18,38 +18,94 @@ After authenticating, the server will respond with status 200 and this JSON obje
 
 ```json
 {
+  "userid": 123,
   "new": false
 }
 ```
 
-## ---------- Books ----------
+## ---------- Library ----------
 
-### The Book object
+### The Library object
 
 ```json
 {
-  "id": 123,
-  "user_id": 123,
-  "title": "A Book Title",
-  "author": "An Author Name",
-  "isbn": "1234567890123",
-  "summary": "Can be very long",
-  "visibility": "public",
-  "categories": ["horror", "scifi"]
+  "user": {
+    "id": 123,
+    "display_name": "Up to 255 chars",
+    "name": "Up to 255 chars",
+    "status": "friends"
+  },
+  "books": [
+    {
+      "id": 123,
+      "user_id": 123,
+      "title": "A Book Title",
+      "author": "An Author Name",
+      "isbn": "1234567890123",
+      "summary": "Can be very long",
+      "visibility": "public",
+      "categories": ["horror", "scifi"],
+      "loan": {
+        "id": 123,
+        "owner": {
+          "id": 123,
+          "display_name": "Up to 255 chars",
+          "name": "Up to 255 chars"
+        },
+        "requester": {
+          "id": 123,
+          "display_name": "Up to 255 chars",
+          "name": "Up to 255 chars"
+        },
+        "request_date": "2020-04-16T15:38:49.000Z",
+        "accept_date": "2020-04-16T15:38:49.000Z",
+        "loan_start_date": "2020-04-16T15:38:49.000Z",
+        "loan_end_date": "2020-04-16T15:38:49.000Z",
+        "status": "pending"
+      }
+    },
+    {
+      "id": 124,
+      "user_id": 123,
+      "title": "A Book Title 2",
+      "author": "An Author Name 2",
+      "isbn": "9876543210",
+      "summary": "Is a summary",
+      "visibility": "private",
+      "categories": ["horror", "scifi"],
+      "loan": {
+        "id": 123,
+        "owner": {
+          "id": 123,
+          "display_name": "Up to 255 chars",
+          "name": "Up to 255 chars"
+        },
+        "requester": {
+          "id": 123,
+          "display_name": "Up to 255 chars",
+          "name": "Up to 255 chars"
+        },
+        "request_date": "2020-04-16T15:38:49.000Z",
+        "accept_date": "2020-04-16T15:38:49.000Z",
+        "loan_start_date": "2020-04-16T15:38:49.000Z",
+        "loan_end_date": "2020-04-16T15:38:49.000Z",
+        "status": "loaned"
+      }
+    }
+  ]
 }
 ```
 
-Visibility is an ENUM and can be referenced by string name ("public" | "private" | "friends")
+Book visibility is an ENUM and can be referenced by string name ("public" | "private" | "friends")\
+Loan status is an ENUM and can be referenced by string name ("pending" | "accepted" | "loaned" | "returned" | "late")\
+Loan will be the active (accepted or loaned) loan or null
 
 ### Routes
 
-|     Type | Route        | Description                                                              |
-| -------: | ------------ | ------------------------------------------------------------------------ |
-|    `GET` | `/books`     | Get all the books for the current user. Returns an array of book objects |
-|   `POST` | `/books`     | Create a new book                                                        |
-|    `GET` | `/books/:id` | Get a single book object by its id                                       |
-|    `PUT` | `/books/:id` | Modify a book object by its id                                           |
-| `DELETE` | `/books/:id` | Delete a book object by its id                                           |
+|  Type | Route            | Description                     |
+| ----: | ---------------- | ------------------------------- |
+| `GET` | `/libraries`     | Get the current user's library  |
+| `GET` | `/libraries/:id` | Get the library for the user id |
 
 ## ---------- Users ----------
 
@@ -58,7 +114,6 @@ Visibility is an ENUM and can be referenced by string name ("public" | "private"
 ```json
 {
   "id": 123,
-  "display_name": "Up to 255 chars",
   "name": "Up to 255 chars"
 }
 ```
@@ -95,7 +150,7 @@ Visibility is an ENUM and can be referenced by string name ("public" | "private"
 
 ## ---------- Friends ----------
 
-### A Friend Object
+### The Friend Object
 
 ```json
 {

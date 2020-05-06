@@ -2,10 +2,35 @@ var express = require("express");
 var router = express.Router();
 var db = require("../db.js");
 
+router.route("/").get(function (req, res) {
+  let user = req.body;
+  db.users.getUserByName(user).then((user) => {
+    if (!user) {
+      res.statusCode = 404;
+      res.end();
+      return;
+    }
+    res.statusCode = 200;
+    res.json(user);
+  });
+});
+
+router.route("/:name").get(function (req, res) {
+  db.users.getUserByName(req.params.name).then((user) => {
+    if (!user) {
+      res.statusCode = 404;
+      res.end();
+      return;
+    }
+    res.statusCode = 200;
+    res.json(user);
+  });
+});
+
 router
   .route("/:id")
   .get(function (req, res) {
-    db.users.get(req.params.id).then((user) => {
+    db.users.getUserById(req.params.id).then((user) => {
       if (!user) {
         res.statusCode = 404;
         res.end();
@@ -19,7 +44,6 @@ router
     let user = req.body;
     db.users.update(user).then(([result, fields]) => {
       if (result.affectedRows == 0) {
-        // If no rows are affected, send a 404.
         res.statusCode = 404;
         res.end();
         return;

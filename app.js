@@ -33,7 +33,7 @@ const routeProtection = (req, res, next) => {
   next();
 };
 
-var bookRoutes = require("./routes/books");
+var libraryRoutes = require("./routes/libraries");
 var categoryRoutes = require("./routes/categories");
 var friendRoutes = require("./routes/friends");
 var loanRoutes = require("./routes/loans");
@@ -54,11 +54,11 @@ router
     res.header("Access-Control-Allow-Credentials", true);
     next();
   })
-  .use("/books", routeProtection, bookRoutes)
-  .use("/categories", routeProtection, categoryRoutes)
-  .use("/friends", routeProtection, friendRoutes)
-  .use("/loans", routeProtection, loanRoutes)
-  .use("/users", routeProtection, userRoutes)
+  .use("/libraries", libraryRoutes)
+  .use("/categories", categoryRoutes)
+  .use("/friends", friendRoutes)
+  .use("/loans", loanRoutes)
+  .use("/users", userRoutes)
   .use("/login", loginRoutes);
 
 // Routes start with /api
