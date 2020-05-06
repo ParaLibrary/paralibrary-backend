@@ -11,6 +11,7 @@ router.route("/").post((req, res) => {
     .then((payload) => {
       if (!req.session.userId) {
         // Check if user is in database already
+        let isNewUser = false;
         db.users
           .getByGoogleId(payload.sub)
           .then((user) => {
@@ -19,6 +20,7 @@ router.route("/").post((req, res) => {
               return db.users
                 .insert({ name: payload.name, google_id: payload.sub })
                 .then(([results, fields]) => {
+                  isNewUser = true;
                   return results.insertId;
                 });
             }
@@ -28,11 +30,11 @@ router.route("/").post((req, res) => {
           .then((userId) => {
             // Store only the userId in the session
             req.session.userId = userId;
-            res.json({ userId: userId });
+            res.json({ userId: userId, new: isNewUser });
             res.end();
           });
       } else {
-        res.json({ userId: req.session.userId });
+        res.json({ userId: req.session.userId, new: false });
         res.end();
       }
     })
