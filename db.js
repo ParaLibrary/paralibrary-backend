@@ -20,7 +20,7 @@ pool.query("SELECT 1+1")
 
 var books = (function () {
   return {
-    get: function (bookId) {
+    getBookById: function (bookId) {
       var sql = "SELECT * FROM books WHERE id = ?";
       var inserts = [bookId];
       sql = mysql.format(sql, inserts);
@@ -148,7 +148,16 @@ var friends = (function () {
 
 var users = (function () {
   return {
-    get: function (userId) {
+    getUserByName: function (userName) {
+      var expr = "'" + userName + "%'";
+      var sql = `SELECT * FROM users WHERE name LIKE '${userName}%'`;
+
+      return pool.query(sql)
+        .then(([rows, fields]) => {
+          return rows;
+        });
+    },
+    getUserById: function (userId) {
       var sql = "SELECT * FROM users WHERE id = ?";
       var inserts = [userId];
       sql = mysql.format(sql, inserts);

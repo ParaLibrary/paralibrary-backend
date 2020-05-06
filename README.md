@@ -4,7 +4,6 @@ The API for the ParaLibrary application\
 All routes start with `https://paralibrary.digital/api`
 
 ## ---------- Library ----------
-
 ### The Library object
 
 ```json
@@ -87,14 +86,13 @@ Loan will be the active (accepted or loaned) loan or null
 | `GET` | `/libraries`     | Get the current user's library  |
 | `GET` | `/libraries/:id` | Get the library for the user id |
 
-## ---------- Users ----------
 
+## ---------- Users ----------
 ### The User Object
 
 ```json
 {
   "id": 123,
-  "display_name": "Up to 255 chars",
   "name": "Up to 255 chars"
 }
 ```
@@ -108,8 +106,8 @@ Loan will be the active (accepted or loaned) loan or null
 |    `PUT` | `/users/:id` | Modify the user object by his/her id  |
 | `DELETE` | `/users/:id` | Delete the user oobject by his/her id |
 
-## ---------- Categories ----------
 
+## ---------- Categories ----------
 ### The Category Object
 
 ```json
@@ -121,7 +119,6 @@ Loan will be the active (accepted or loaned) loan or null
 ```
 
 ### Routes
-
 |     Type | Route             | Description                                 |
 | -------: | ----------------- | ------------------------------------------- |
 |    `GET` | `/categories`     | Get all the categories for the current user |
@@ -130,9 +127,9 @@ Loan will be the active (accepted or loaned) loan or null
 |    `PUT` | `/categories/:id` | Modify a category object by its id          |
 | `DELETE` | `/categories/:id` | Delete a category object by its id          |
 
-## ---------- Friends ----------
 
-### A Friend Object
+## ---------- Friends ----------
+### The Friend Object
 
 ```json
 {
@@ -174,8 +171,8 @@ And the last would be:
 "rejected"
 }
 
-## ---------- Loans ----------
 
+## ---------- Loans ----------
 ### The Loans Object
 
 ```json
