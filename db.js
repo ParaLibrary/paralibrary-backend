@@ -112,7 +112,6 @@ var categories = (function () {
 var friends = (function () {
   return {
     get: function (friendId) {
-
       var sql =  "SELECT friend_id, status, name " + 
                   "FROM friendships JOIN users " +
                   "ON friend_id = id " +
