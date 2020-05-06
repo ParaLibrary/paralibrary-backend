@@ -2,7 +2,20 @@ var express = require("express");
 var router = express.Router();
 var db = require("../db.js");
 
-router.route("/").get(function (req, res) {
+router.route("/")
+.get(function (req, res) {    
+  let userId = req.body;
+  db.libraries.getUsersLibrary(userId).then((user) => {
+    if (!user) {
+      res.statusCode = 404;
+      res.end()
+      return;
+   }
+    res.statusCode = 200;
+    res.json(user);
+  });
+})
+/*.get(function (req, res) {
   res.json({
     user: {
       id: 123,
@@ -52,9 +65,22 @@ router.route("/").get(function (req, res) {
       },
     ],
   });
-});
+});*/
 
-router.route("/:id").get(function (req, res) {
+router.route("/:id")
+.get(function (req, res) {    
+  db.libraries.getLibraryById(req.params.id).then((user) => {
+    if (!user) {
+      res.statusCode = 404;
+      res.end()
+      return;
+   }
+    res.statusCode = 200;
+    res.json(user);
+  });
+})
+/*
+.get(function (req, res) {
   res.json({
     user: {
       id: 123,
@@ -104,6 +130,6 @@ router.route("/:id").get(function (req, res) {
       },
     ],
   });
-});
+});*/
 
 module.exports = router;

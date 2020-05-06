@@ -146,6 +146,40 @@ var friends = (function () {
   };
 })();
 
+var libraries = (function () {
+  return {
+    getUsersLibrary: function (userId) {    // TODO: Add in categories field to query.
+      var sql =  "SELECT id, user_id, title, author, isbn, summary, visibility" + 
+                  "FROM books" + 
+                  "WHERE user_id = ?";
+      var inserts = [userId.id];
+      sql = mysql.format(sql, inserts);
+      
+      return pool.query(sql)
+        .then(([rows, fields]) => {
+          return rows;
+        }
+      );
+    },
+
+  getLibraryById: function (userId) {    // TODO: Add in categories field to query.
+    var sql =  "SELECT id, user_id, title, author, isbn, summary, visibility " +
+               "FROM books " +
+               "WHERE user_id = ? " +
+               "AND visibility = 'public'" 
+    var inserts = [userId];
+    sql = mysql.format(sql, inserts);
+    
+    return pool.query(sql)
+      .then(([rows, fields]) => {
+        return rows;
+      }
+    );
+  },
+};
+})();
+
+
 var users = (function () {
   return {
     get: function (userId) {
@@ -217,5 +251,6 @@ module.exports = {
   books,
   categories,
   friends,
+  libraries,
   users
 };
