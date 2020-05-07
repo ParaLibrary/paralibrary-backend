@@ -2,23 +2,44 @@ var express = require("express");
 var router = express.Router();
 var db = require("../db.js");
 const { OAuth2Client } = require("google-auth-library");
-const clientId =
-  "631703414652-navvamq2108qu88d9i7bo77gn2kqsi40.apps.googleusercontent.com";
-const client = new OAuth2Client(clientId);
+const gClientId = process.env.GOOGLE_CLIENT_ID;
+const client = new OAuth2Client(gClientId);
 
-router.route("/").post(function (req, res) {
-  verify(req.body.idtoken)
+router.route("/").post((req, res) => {
+  let token = req.body.idtoken;
+  verify(token)
     .then((payload) => {
-      console.log(payload);
-    })
-    .then(() => {
-      // Create session
-      // Return session id in cookie (httpOnly)
-      res.statusCode = 200;
-      res.end();
+      if (!req.session.userId) {
+        // Check if user is in database already
+        let isNewUser = false;
+        db.users
+          .getByGoogleId(payload.sub)
+          .then((user) => {
+            // Create new user
+            if (!user) {
+              return db.users
+                .insert({ name: payload.name, google_id: payload.sub })
+                .then(([results, fields]) => {
+                  isNewUser = true;
+                  return results.insertId;
+                });
+            }
+            // Existing user
+            return user.id;
+          })
+          .then((userId) => {
+            // Store only the userId in the session
+            req.session.userId = userId;
+            res.json({ userId: userId, new: isNewUser });
+            res.end();
+          });
+      } else {
+        res.json({ userId: req.session.userId, new: false });
+        res.end();
+      }
     })
     .catch((error) => {
-      console.error(error);
+      res.status(401).end();
     });
 });
 
@@ -26,7 +47,7 @@ async function verify(token) {
   return client
     .verifyIdToken({
       idToken: token,
-      audience: clientId,
+      audience: gClientId,
     })
     .then((ticket) => {
       return ticket.getPayload();

@@ -3,7 +3,28 @@
 The API for the ParaLibrary application\
 All routes start with `https://paralibrary.digital/api`
 
+## ---------- Authentication ----------
+
+### Routes
+
+|   Type | Route     | Description                                                            |
+| -----: | --------- | ---------------------------------------------------------------------- |
+| `POST` | `/login`  | Start an authenticated session. Must include "tokenid: string" in json |
+| `POST` | `/logout` | Destroy the current session                                            |
+
+### Login Response
+
+After authenticating, the server will respond with status 200 and this JSON object, indicating whether a new user was created or not. If authentication fails, the server will respond with status 401.
+
+```json
+{
+  "userid": 123,
+  "new": false
+}
+```
+
 ## ---------- Library ----------
+
 ### The Library object
 
 ```json
@@ -86,8 +107,8 @@ Loan will be the active (accepted or loaned) loan or null
 | `GET` | `/libraries`     | Get the current user's library  |
 | `GET` | `/libraries/:id` | Get the library for the user id |
 
-
 ## ---------- Users ----------
+
 ### The User Object
 
 ```json
@@ -101,13 +122,12 @@ Loan will be the active (accepted or loaned) loan or null
 
 |     Type | Route        | Description                           |
 | -------: | ------------ | ------------------------------------- |
-|   `POST` | `/users`     | Create a new user                     |
 |    `GET` | `/users/:id` | Get the current user by his/her id    |
 |    `PUT` | `/users/:id` | Modify the user object by his/her id  |
 | `DELETE` | `/users/:id` | Delete the user oobject by his/her id |
 
-
 ## ---------- Categories ----------
+
 ### The Category Object
 
 ```json
@@ -119,6 +139,7 @@ Loan will be the active (accepted or loaned) loan or null
 ```
 
 ### Routes
+
 |     Type | Route             | Description                                 |
 | -------: | ----------------- | ------------------------------------------- |
 |    `GET` | `/categories`     | Get all the categories for the current user |
@@ -127,8 +148,8 @@ Loan will be the active (accepted or loaned) loan or null
 |    `PUT` | `/categories/:id` | Modify a category object by its id          |
 | `DELETE` | `/categories/:id` | Delete a category object by its id          |
 
-
 ## ---------- Friends ----------
+
 ### The Friend Object
 
 ```json
@@ -171,8 +192,8 @@ And the last would be:
 "rejected"
 }
 
-
 ## ---------- Loans ----------
+
 ### The Loans Object
 
 ```json
