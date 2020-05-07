@@ -107,6 +107,34 @@ Loan will be the active (accepted or loaned) loan or null
 | `GET` | `/libraries`     | Get the current user's library  |
 | `GET` | `/libraries/:id` | Get the library for the user id |
 
+## ---------- Books ----------
+
+### The Book object
+
+```json
+{
+  "id": 123,
+  "user_id": 123,
+  "title": "A Book Title",
+  "author": "An Author Name",
+  "isbn": "1234567890123",
+  "summary": "Can be very long",
+  "visibility": "public"
+}
+```
+
+Visibility is an ENUM and can be referenced by string name ("public" | "private" | "friends")
+
+### Routes
+
+|     Type | Route        | Description                                                              |
+| -------: | ------------ | ------------------------------------------------------------------------ |
+|    `GET` | `/books`     | Get all the books for the current user. Returns an array of book objects |
+|   `POST` | `/books`     | Create a new book                                                        |
+|    `GET` | `/books/:id` | Get a single book object by its id                                       |
+|    `PUT` | `/books/:id` | Modify a book object by its id                                           |
+| `DELETE` | `/books/:id` | Delete a book object by its id                                           |
+
 ## ---------- Users ----------
 
 ### The User Object
