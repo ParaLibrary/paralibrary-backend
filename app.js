@@ -27,8 +27,6 @@ app.use(
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-<<<<<<< Updated upstream
-=======
 // CORS Configuration
 const corsConfig = {
   origin: ["http://paralibrary.digital", "http://localhost:3000"],
@@ -39,7 +37,6 @@ const corsConfig = {
 app.use(cors(corsConfig));
 
 // Authentication Protection
->>>>>>> Stashed changes
 const routeProtection = (req, res, next) => {
   if (req.session.userId == null) {
     // Unauthorized
