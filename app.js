@@ -9,6 +9,8 @@ var cors = require("cors");
 const port = process.env.PORT || 8080;
 const sessionStore = new MySQLStore({}, db.pool);
 
+// Age is 12 hours
+const maxAge = 1000 * 60 * 60 * 12;
 const app = express();
 
 // Session Configuration
@@ -20,7 +22,7 @@ app.use(
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      maxAge: 1000 * 60 * 3,
+      maxAge: maxAge,
     },
   })
 );
@@ -32,7 +34,7 @@ const corsConfig = {
   origin: ["http://paralibrary.digital", "http://localhost:3000"],
   methods: ["GET", "PUT", "POST", "DELETE", "OPTIONS"],
   credentials: true,
-  maxAge: 1728000,
+  maxAge: maxAge,
 };
 app.use(cors(corsConfig));
 
