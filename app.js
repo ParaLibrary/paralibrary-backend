@@ -8,6 +8,8 @@ const MySQLStore = require("express-mysql-session")(session);
 const port = process.env.PORT || 8080;
 const sessionStore = new MySQLStore({}, db.pool);
 
+// Age is 12 hours
+const maxAge = 1000 * 60 * 60 * 12;
 const app = express();
 
 app.use(
@@ -18,13 +20,26 @@ app.use(
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      maxAge: 1000 * 60 * 3,
+      maxAge: maxAge,
     },
   })
 );
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+<<<<<<< Updated upstream
+=======
+// CORS Configuration
+const corsConfig = {
+  origin: ["http://paralibrary.digital", "http://localhost:3000"],
+  methods: ["GET", "PUT", "POST", "DELETE", "OPTIONS"],
+  credentials: true,
+  maxAge: maxAge,
+};
+app.use(cors(corsConfig));
+
+// Authentication Protection
+>>>>>>> Stashed changes
 const routeProtection = (req, res, next) => {
   if (req.session.userId == null) {
     // Unauthorized
