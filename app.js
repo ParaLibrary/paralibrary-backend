@@ -4,12 +4,14 @@ const bodyParser = require("body-parser");
 const db = require("./db");
 const session = require("express-session");
 const MySQLStore = require("express-mysql-session")(session);
+var cors = require("cors");
 
 const port = process.env.PORT || 8080;
 const sessionStore = new MySQLStore({}, db.pool);
 
 const app = express();
 
+// Session Configuration
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
@@ -25,6 +27,16 @@ app.use(
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// CORS Configuration
+const corsConfig = {
+  origin: ["http://paralibrary.digital", "http://localhost:3000"],
+  methods: ["GET", "PUT", "POST", "DELETE", "OPTIONS"],
+  credentials: true,
+  maxAge: 1728000,
+};
+app.use(cors(corsConfig));
+
+// Authentication Protection
 const routeProtection = (req, res, next) => {
   if (req.session.userId == null) {
     // Unauthorized
@@ -33,6 +45,7 @@ const routeProtection = (req, res, next) => {
   next();
 };
 
+// API Routing
 var libraryRoutes = require("./routes/libraries");
 var categoryRoutes = require("./routes/categories");
 var friendRoutes = require("./routes/friends");
@@ -45,14 +58,10 @@ var router = express.Router();
 router
   .use("/", function (req, res, next) {
     if (process.env.NODE_ENV === "development") {
-      console.log("Something is happening.");
-      res.header("Access-Control-Allow-Origin", "http://localhost:3000");
-      res.header(
-        "Access-Control-Allow-Headers",
-        "Origin, X-Requested-With, Content-Type, Accept"
+      console.log(
+        `${req.protocol}://${req.hostname} sent the request: ${req.method} ${req.originalUrl}`
       );
     }
-    res.header("Access-Control-Allow-Credentials", true);
     next();
   })
   .use("/libraries", routeProtection, libraryRoutes)
