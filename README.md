@@ -182,7 +182,6 @@ Visibility is an ENUM and can be referenced by string name ("public" | "private"
 ```json
 {
   "id": 123,
-  "display_name": "Up to 255 chars",
   "name": "Up to 255 chars",
   "status": "requested"
 }
