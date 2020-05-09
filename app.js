@@ -4,16 +4,21 @@ const bodyParser = require("body-parser");
 const db = require("./db");
 const session = require("express-session");
 const MySQLStore = require("express-mysql-session")(session);
-var cors = require("cors");
+const cors = require("cors");
+
+const libraryRoutes = require("./routes/libraries");
+const categoryRoutes = require("./routes/categories");
+const friendRoutes = require("./routes/friends");
+const loanRoutes = require("./routes/loans");
+const userRoutes = require("./routes/users");
+const bookRoutes = require("./routes/books");
+const { router: loginRoutes, maxAge } = require("./routes/login");
 
 const port = process.env.PORT || 8080;
-const sessionStore = new MySQLStore({}, db.pool);
-
-// Age is 12 hours
-const maxAge = 1000 * 60 * 60 * 12;
 const app = express();
 
 // Session Configuration
+const sessionStore = new MySQLStore({}, db.pool);
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
@@ -48,14 +53,6 @@ const routeProtection = (req, res, next) => {
 };
 
 // API Routing
-var libraryRoutes = require("./routes/libraries");
-var categoryRoutes = require("./routes/categories");
-var friendRoutes = require("./routes/friends");
-var loanRoutes = require("./routes/loans");
-var userRoutes = require("./routes/users");
-var bookRoutes = require("./routes/books");
-var loginRoutes = require("./routes/login");
-
 var router = express.Router();
 router
   .use("/", function (req, res, next) {

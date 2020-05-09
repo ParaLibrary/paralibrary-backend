@@ -19,7 +19,8 @@ After authenticating, the server will respond with status 200 and this JSON obje
 ```json
 {
   "userid": 123,
-  "new": false
+  "new": false,
+  "maxAge": 123
 }
 ```
 
@@ -127,12 +128,12 @@ Visibility is an ENUM and can be referenced by string name ("public" | "private"
 
 ### Routes
 
-|     Type | Route        | Description                                                              |
-| -------: | ------------ | ------------------------------------------------------------------------ |
-|   `POST` | `/books`     | Create a new book                                                        |
-|    `GET` | `/books/:id` | Get a single book object by its id                                       |
-|    `PUT` | `/books/:id` | Modify a book object by its id                                           |
-| `DELETE` | `/books/:id` | Delete a book object by its id                                           |
+|     Type | Route        | Description                        |
+| -------: | ------------ | ---------------------------------- |
+|   `POST` | `/books`     | Create a new book                  |
+|    `GET` | `/books/:id` | Get a single book object by its id |
+|    `PUT` | `/books/:id` | Modify a book object by its id     |
+| `DELETE` | `/books/:id` | Delete a book object by its id     |
 
 ## ---------- Users ----------
 
