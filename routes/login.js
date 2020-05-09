@@ -5,8 +5,8 @@ const { OAuth2Client } = require("google-auth-library");
 const gClientId = process.env.GOOGLE_CLIENT_ID;
 const client = new OAuth2Client(gClientId);
 
-// Age is 12 hours
-const maxAge = 1000 * 60 * 60 * 12;
+// Age is 1 hours
+const maxAge = 1000 * 60 * 60;
 
 router.route("/").post((req, res) => {
   let token = req.body.idtoken;

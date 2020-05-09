@@ -25,6 +25,7 @@ app.use(
     store: sessionStore,
     resave: false,
     saveUninitialized: false,
+    rolling: true,
     cookie: {
       httpOnly: true,
       maxAge: maxAge,
