@@ -1,7 +1,7 @@
 # ParaLibrary API
 
 The API for the ParaLibrary application\
-All routes start with `https://paralibrary.digital/api`
+All routes start with `http://paralibrary.digital/api`
 
 ## ---------- Authentication ----------
 
