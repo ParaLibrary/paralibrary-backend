@@ -106,7 +106,6 @@ Loan will be the active (accepted or loaned) loan or null
 
 |     Type | Route        | Description                          |
 | -------: | ------------ | ------------------------------------ |
-|   `POST` | `/users`     | Create a new user                    |
 |    `GET` | `/users/:id` | Get the current user by his/her id   |
 |    `PUT` | `/users/:id` | Modify the user object by his/her id |
 | `DELETE` | `/users/:id` | Delete the user object by his/her id |

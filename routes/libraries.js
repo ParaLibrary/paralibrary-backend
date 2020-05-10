@@ -16,14 +16,14 @@ router.route("/").get(function (req, res) {
 });
 
 router.route("/:id").get(function (req, res) {
-  db.libraries.getLibraryById(req.params.id).then((user) => {
+  db.libraries.getLibraryById(req.params.id).then((library) => {
     if (!user) {
       res.statusCode = 404;
       res.end();
       return;
     }
     res.statusCode = 200;
-    res.json(user);
+    res.json(library);
   });
 });
 

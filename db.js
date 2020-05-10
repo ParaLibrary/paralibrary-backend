@@ -289,13 +289,6 @@ var users = (function () {
         return rows[0];
       });
     },
-    insert: function (userName) {
-      var sql = "INSERT INTO users (name) VALUES (?,?)";
-      var inserts = [userName];
-      sql = mysql.format(sql, inserts);
-
-      return pool.query(sql);
-    },
     update: function (user) {
       var sql = "UPDATE users SET name = ? WHERE id = ?";
       var inserts = [user.name, user.id];
