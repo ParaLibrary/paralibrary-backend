@@ -11,7 +11,6 @@ All routes start with `https://paralibrary.digital/api`
 {
   "user": {
     "id": 123,
-    "display_name": "Up to 255 chars",
     "name": "Up to 255 chars",
     "status": "friends"
   },
@@ -25,7 +24,7 @@ All routes start with `https://paralibrary.digital/api`
       "summary": "Can be very long",
       "visibility": "public",
       "categories": ["horror", "scifi"],
-      "loan": {
+      "loans": {
         "id": 123,
         "owner": {
           "id": 123,
@@ -53,24 +52,26 @@ All routes start with `https://paralibrary.digital/api`
       "summary": "Is a summary",
       "visibility": "private",
       "categories": ["horror", "scifi"],
-      "loan": {
-        "id": 123,
-        "owner": {
+      "loans": [
+        {
           "id": 123,
-          "display_name": "Up to 255 chars",
-          "name": "Up to 255 chars"
-        },
-        "requester": {
-          "id": 123,
-          "display_name": "Up to 255 chars",
-          "name": "Up to 255 chars"
-        },
-        "request_date": "2020-04-16T15:38:49.000Z",
-        "accept_date": "2020-04-16T15:38:49.000Z",
-        "loan_start_date": "2020-04-16T15:38:49.000Z",
-        "loan_end_date": "2020-04-16T15:38:49.000Z",
-        "status": "loaned"
-      }
+          "owner": {
+            "id": 123,
+            "display_name": "Up to 255 chars",
+            "name": "Up to 255 chars"
+          },
+          "requester": {
+            "id": 123,
+            "display_name": "Up to 255 chars",
+            "name": "Up to 255 chars"
+          },
+          "request_date": "2020-04-16T15:38:49.000Z",
+          "accept_date": "2020-04-16T15:38:49.000Z",
+          "loan_start_date": "2020-04-16T15:38:49.000Z",
+          "loan_end_date": "2020-04-16T15:38:49.000Z",
+          "status": "loaned"
+        }
+      ]
     }
   ]
 }
