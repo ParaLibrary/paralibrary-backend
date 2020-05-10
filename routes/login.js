@@ -5,6 +5,9 @@ const { OAuth2Client } = require("google-auth-library");
 const gClientId = process.env.GOOGLE_CLIENT_ID;
 const client = new OAuth2Client(gClientId);
 
+// Age is 1 hours
+const maxAge = 1000 * 60 * 60;
+
 router.route("/").post((req, res) => {
   let token = req.body.idtoken;
   verify(token)
@@ -30,11 +33,11 @@ router.route("/").post((req, res) => {
           .then((userId) => {
             // Store only the userId in the session
             req.session.userId = userId;
-            res.json({ userId: userId, new: isNewUser });
+            res.json({ userId: userId, new: isNewUser, maxAge: maxAge });
             res.end();
           });
       } else {
-        res.json({ userId: req.session.userId, new: false });
+        res.json({ userId: req.session.userId, new: false, maxAge: maxAge });
         res.end();
       }
     })
@@ -54,4 +57,4 @@ async function verify(token) {
     });
 }
 
-module.exports = router;
+module.exports = { router, maxAge };
