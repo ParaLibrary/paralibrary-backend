@@ -24,7 +24,8 @@ All routes start with `https://paralibrary.digital/api`
       "summary": "Can be very long",
       "visibility": "public",
       "categories": ["horror", "scifi"],
-      "loans": {
+      "loan_count": 123,
+      "loan": {
         "id": 123,
         "owner": {
           "id": 123,
@@ -52,7 +53,8 @@ All routes start with `https://paralibrary.digital/api`
       "summary": "Is a summary",
       "visibility": "private",
       "categories": ["horror", "scifi"],
-      "loans": [
+      "loan_count": 123,
+      "loan": [
         {
           "id": 123,
           "owner": {
@@ -83,10 +85,10 @@ Loan will be the active (accepted or loaned) loan or null
 
 ### Routes
 
-|  Type | Route            | Description                     |
-| ----: | ---------------- | ------------------------------- |
-| `GET` | `/libraries`     | Get the current user's library  |
-| `GET` | `/libraries/:id` | Get the library for the user id |
+|  Type | Route            | Description                            |
+| ----: | ---------------- | -------------------------------------- |
+| `GET` | `/libraries`     | Get the current user's library         |
+| `GET` | `/libraries/:id` | Get a library for a user by his/her id |
 
 ## ---------- Users ----------
 
@@ -102,12 +104,12 @@ Loan will be the active (accepted or loaned) loan or null
 
 ### Routes
 
-|     Type | Route        | Description                           |
-| -------: | ------------ | ------------------------------------- |
-|   `POST` | `/users`     | Create a new user                     |
-|    `GET` | `/users/:id` | Get the current user by his/her id    |
-|    `PUT` | `/users/:id` | Modify the user object by his/her id  |
-| `DELETE` | `/users/:id` | Delete the user oobject by his/her id |
+|     Type | Route        | Description                          |
+| -------: | ------------ | ------------------------------------ |
+|   `POST` | `/users`     | Create a new user                    |
+|    `GET` | `/users/:id` | Get the current user by his/her id   |
+|    `PUT` | `/users/:id` | Modify the user object by his/her id |
+| `DELETE` | `/users/:id` | Delete the user object by his/her id |
 
 ## ---------- Categories ----------
 

@@ -167,66 +167,117 @@ var friends = (function () {
 var libraries = (function () {
   return {
     getUsersLibrary: async function (userId) {
-      // TODO: Add in categories field to query.
-      var userQuery = "SELECT * " + "FROM users " + "WHERE id = ?";
-      var inserts = [userId.id];
+      var userQuery = "SELECT * FROM users WHERE id = ?";
+      var inserts = [userId];
       userQuery = mysql.format(userQuery, inserts);
 
-      var bookQuery = "SELECT * " + "FROM books " + "WHERE user_id = ?";
-      var inserts = [userId.id];
+      // TODO: Add in categories field to book query.
+      var bookQuery = "SELECT * FROM books WHERE user_id = ?";
+      var inserts = [userId];
       bookQuery = mysql.format(bookQuery, inserts);
 
-      let user = await users.get(userId.id);
+      let user = await pool.query(userQuery).then(([rows, fields]) => {
+        return rows;
+      });
 
       let books = await pool.query(bookQuery).then(([rows, fields]) => {
         return rows;
       });
 
       for (var i = 0; i < books.length; i++) {
-        //var book = books[i];
         var data = books[i].id;
 
         var loanQuery =
-          `SELECT * FROM loans ` +
-          `WHERE book_id = '${data}' ` +
+          `SELECT * FROM loans WHERE book_id = '${data}' ` +
           `ORDER BY accept_date DESC LIMIT 1`;
 
-        var loans = await pool
-          .query(loanQuery)
+        var loans = await pool.query(loanQuery).then(([rows, fields]) => {
+          if (!rows || rows.length === 0) {
+            return null;
+          }
+          return rows[0];
+        });
 
+        var loanCountQuery = `SELECT COUNT (*) as "count" FROM loans WHERE book_id = '${data}'`;
+
+        var loanCount = await pool
+          .query(loanCountQuery)
           .then(([rows, fields]) => {
             if (!rows || rows.length === 0) {
               return null;
             }
-            return rows[0];
+            return rows[0].count;
           });
 
-        //book.loans = loans;
+        books[i].loan_count = loanCount;
+        books[i].loan = loans;
       }
 
-      return { user, books, loans };
+      return { user, books };
     },
 
     getLibraryById: function (userId) {
-      // TODO: Add in categories field to query.
-      var sql =
-        "SELECT id, user_id, title, author, isbn, summary, visibility " +
-        "FROM books " +
-        "WHERE user_id = ? " +
-        "AND visibility = 'public'";
+      var userQuery = "SELECT * FROM users WHERE id = ?";
       var inserts = [userId];
-      sql = mysql.format(sql, inserts);
+      userQuery = mysql.format(userQuery, inserts);
 
-      return pool.query(sql).then(([rows, fields]) => {
+      // TODO: Add in categories field to book query.
+      var bookQuery = "SELECT * FROM books WHERE user_id = ? AND visibility = 'public'";
+      var inserts = [userId];
+      bookQuery = mysql.format(bookQuery, inserts);
+
+      let user = await pool.query(userQuery).then(([rows, fields]) => {
         return rows;
       });
+
+      let books = await pool.query(bookQuery).then(([rows, fields]) => {
+        return rows;
+      });
+
+      for (var i = 0; i < books.length; i++) {
+        var data = books[i].id;
+
+        var loanQuery =
+          `SELECT * FROM loans WHERE book_id = '${data}' ` +
+          `ORDER BY accept_date DESC LIMIT 1`;
+
+        var loans = await pool.query(loanQuery).then(([rows, fields]) => {
+          if (!rows || rows.length === 0) {
+            return null;
+          }
+          return rows[0];
+        });
+
+        var loanCountQuery = `SELECT COUNT (*) as "count" FROM loans WHERE book_id = '${data}'`;
+
+        var loanCount = await pool
+          .query(loanCountQuery)
+          .then(([rows, fields]) => {
+            if (!rows || rows.length === 0) {
+              return null;
+            }
+            return rows[0].count;
+          });
+
+        books[i].loan_count = loanCount;
+        books[i].loan = loans;
+      }
+
+      return { user, books };
     },
   };
 })();
 
 var users = (function () {
   return {
-    get: function (userId) {
+    getUserByName: function (userName) {
+      var sql = `SELECT * FROM users WHERE name LIKE '${userName}%'`;
+
+      return pool.query(sql).then(([rows, fields]) => {
+        return rows;
+      });
+    },
+    getUserById: function (userId) {
       var sql = "SELECT * FROM users WHERE id = ?";
       var inserts = [userId];
       sql = mysql.format(sql, inserts);
@@ -238,9 +289,9 @@ var users = (function () {
         return rows[0];
       });
     },
-    insert: function (user) {
+    insert: function (userName) {
       var sql = "INSERT INTO users (name) VALUES (?,?)";
-      var inserts = [user.name];
+      var inserts = [userName];
       sql = mysql.format(sql, inserts);
 
       return pool.query(sql);
