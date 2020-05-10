@@ -1,7 +1,28 @@
 # ParaLibrary API
 
 The API for the ParaLibrary application\
-All routes start with `https://paralibrary.digital/api`
+All routes start with `http://paralibrary.digital/api`
+
+## ---------- Authentication ----------
+
+### Routes
+
+|   Type | Route     | Description                                                            |
+| -----: | --------- | ---------------------------------------------------------------------- |
+| `POST` | `/login`  | Start an authenticated session. Must include "tokenid: string" in json |
+| `POST` | `/logout` | Destroy the current session                                            |
+
+### Login Response
+
+After authenticating, the server will respond with status 200 and this JSON object, indicating whether a new user was created or not. If authentication fails, the server will respond with status 401.
+
+```json
+{
+  "userid": 123,
+  "new": false,
+  "maxAge": 123
+}
+```
 
 ## ---------- Library ----------
 
@@ -90,6 +111,33 @@ Loan will be the active (accepted or loaned) loan or null
 | `GET` | `/libraries`     | Get the current user's library         |
 | `GET` | `/libraries/:id` | Get a library for a user by his/her id |
 
+## ---------- Books ----------
+
+### The Book object
+
+```json
+{
+  "id": 123,
+  "user_id": 123,
+  "title": "A Book Title",
+  "author": "An Author Name",
+  "isbn": "1234567890123",
+  "summary": "Can be very long",
+  "visibility": "public"
+}
+```
+
+Visibility is an ENUM and can be referenced by string name ("public" | "private" | "friends")
+
+### Routes
+
+|     Type | Route        | Description                        |
+| -------: | ------------ | ---------------------------------- |
+|   `POST` | `/books`     | Create a new book                  |
+|    `GET` | `/books/:id` | Get a single book object by its id |
+|    `PUT` | `/books/:id` | Modify a book object by its id     |
+| `DELETE` | `/books/:id` | Delete a book object by its id     |
+
 ## ---------- Users ----------
 
 ### The User Object
@@ -97,19 +145,18 @@ Loan will be the active (accepted or loaned) loan or null
 ```json
 {
   "id": 123,
-  "display_name": "Up to 255 chars",
   "name": "Up to 255 chars"
 }
 ```
 
 ### Routes
 
-|     Type | Route        | Description                          |
-| -------: | ------------ | ------------------------------------ |
-|   `POST` | `/users`     | Create a new user                    |
-|    `GET` | `/users/:id` | Get the current user by his/her id   |
-|    `PUT` | `/users/:id` | Modify the user object by his/her id |
-| `DELETE` | `/users/:id` | Delete the user object by his/her id |
+
+|     Type | Route        | Description                           |
+| -------: | ------------ | ------------------------------------- |
+|    `GET` | `/users/:id` | Get the current user by his/her id    |
+|    `PUT` | `/users/:id` | Modify the user object by his/her id  |
+| `DELETE` | `/users/:id` | Delete the user oobject by his/her id |
 
 ## ---------- Categories ----------
 
@@ -135,12 +182,11 @@ Loan will be the active (accepted or loaned) loan or null
 
 ## ---------- Friends ----------
 
-### A Friend Object
+### The Friend Object
 
 ```json
 {
   "id": 123,
-  "display_name": "Up to 255 chars",
   "name": "Up to 255 chars",
   "status": "requested"
 }
@@ -151,31 +197,36 @@ status is an ENUM and can be referenced by string name ("requested" | "waiting" 
 
 ### Routes
 
-|   Type | Route           | Description                                                                                            |
-| -----: | --------------- | ------------------------------------------------------------------------------------------------------ |
-|  `GET` | `/friends`      | Get all the friends for the current user (currently static data)                                       |
-|  `GET` | `/friends/:id`  | A temp route that serves real data by specifying a certain user in the url (gets said user's friends). |
-| `POST` | `/friends/:id/` | Depending on the status passed in, will request/accept/reject a friendship.                            |
+|   Type | Route                | Description                                                                                            |
+| -----: | -------------------- | ------------------------------------------------------------------------------------------------------ |
+|  `GET` | `/friends`           | Returns the current user's friends and people who have requested friendship with the current user      |
+|  `GET` | `/friends/requested` | Returns friends the current user has requested friendship with, but they haven't accepted              |
+|  `GET` | `/friends/:id`       | A temp route that serves real data by specifying a certain user in the url (gets said user's friends). |
+| `POST` | `/friends/:id`       | Set the friendship status from the current user to the target user. See usage below                    |
 
-As a note to front end - to req/acc/rej a friendship using the POST request, one must pass in the status and the target user as a json object.
-
-One example of this is:
+When user A requests friendship with B, A will see the status "requested". B will see the status "waiting". Once B accepts, both A and B will see the status "friends".\
+To change the status of a friendship using the POST request, one must pass in the status and the target user as a json object.\
+To request friendship with user 123,
+```json
 {
-"id": 1,
-"status": "requested"
+  "id": "123",
+  "status": "requested"
 }
-
-Another would be:
+```
+To accept friendship with user 9001,
+```json
 {
-"id": 9001,
-"accepted"
+  "id": 9001,
+  "status": "accepted"
 }
-
-And the last would be:
+```
+To reject friendship with user 9001,
+```json
 {
-"id": 42,
-"rejected"
+  "id": 9001,
+  "status": "rejected"
 }
+```
 
 ## ---------- Loans ----------
 

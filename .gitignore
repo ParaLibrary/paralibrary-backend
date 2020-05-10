@@ -1,6 +1,9 @@
 # Secret files
 /config/db.json
 
+# Lock file
+*.lock
+
 # Logs
 logs
 *.log

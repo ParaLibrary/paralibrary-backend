@@ -23,7 +23,7 @@ pool
 
 var books = (function () {
   return {
-    get: function (bookId) {
+    getBookById: function (bookId) {
       var sql = "SELECT * FROM books WHERE id = ?";
       var inserts = [bookId];
       sql = mysql.format(sql, inserts);
@@ -187,9 +187,8 @@ var libraries = (function () {
       for (var i = 0; i < books.length; i++) {
         var data = books[i].id;
 
-        var loanQuery =
-          `SELECT * FROM loans WHERE book_id = '${data}' ` +
-          `ORDER BY accept_date DESC LIMIT 1`;
+        var loanQuery = `SELECT * FROM loans WHERE book_id = '${data}' ` +
+                        `ORDER BY accept_date DESC LIMIT 1`;
 
         var loans = await pool.query(loanQuery).then(([rows, fields]) => {
           if (!rows || rows.length === 0) {
@@ -212,7 +211,6 @@ var libraries = (function () {
         books[i].loan_count = loanCount;
         books[i].loan = loans;
       }
-
       return { user, books };
     },
 
@@ -237,9 +235,8 @@ var libraries = (function () {
       for (var i = 0; i < books.length; i++) {
         var data = books[i].id;
 
-        var loanQuery =
-          `SELECT * FROM loans WHERE book_id = '${data}' ` +
-          `ORDER BY accept_date DESC LIMIT 1`;
+        var loanQuery = `SELECT * FROM loans WHERE book_id = '${data}' ` +
+                        `ORDER BY accept_date DESC LIMIT 1`;
 
         var loans = await pool.query(loanQuery).then(([rows, fields]) => {
           if (!rows || rows.length === 0) {
@@ -262,7 +259,6 @@ var libraries = (function () {
         books[i].loan_count = loanCount;
         books[i].loan = loans;
       }
-
       return { user, books };
     },
   };
@@ -292,6 +288,28 @@ var users = (function () {
     insert: function (userName) {
       var sql = "INSERT INTO users (name) VALUES (?,?)";
       var inserts = [userName];
+      return pool.query(sql).then(([rows, fields]) => {
+        if (!rows || rows.length === 0) {
+          return null;
+        }
+        return rows[0];
+      });
+    },
+    getByGoogleId: function (googleId) {
+      var sql = "SELECT * FROM users WHERE google_id = ?";
+      var inserts = [googleId];
+      sql = mysql.format(sql, inserts);
+
+      return pool.query(sql).then(([rows, fields]) => {
+        if (!rows || rows.length === 0) {
+          return null;
+        }
+        return rows[0];
+      });
+    },
+    insert: function (user) {
+      var sql = "INSERT INTO users (name, google_id) VALUES (?,?)";
+      var inserts = [user.name, user.google_id];
       sql = mysql.format(sql, inserts);
 
       return pool.query(sql);
@@ -341,6 +359,7 @@ async function executeTransaction(queries) {
 }
 
 module.exports = {
+  pool,
   books,
   categories,
   friends,
