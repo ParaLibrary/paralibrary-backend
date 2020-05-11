@@ -1,31 +1,76 @@
-var express = require("express");
-var app = express();
-var bodyParser = require("body-parser");
+require("dotenv").config();
+const express = require("express");
+const bodyParser = require("body-parser");
+const db = require("./db");
+const session = require("express-session");
+const MySQLStore = require("express-mysql-session")(session);
+const cors = require("cors");
 
-// configure app to use bodyParser()
-// this will let us get the data from a POST
-app.use(bodyParser.urlencoded({ extended: true }));
+const libraryRoutes = require("./routes/libraries");
+const categoryRoutes = require("./routes/categories");
+const friendRoutes = require("./routes/friends");
+const loanRoutes = require("./routes/loans");
+const userRoutes = require("./routes/users");
+const bookRoutes = require("./routes/books");
+const { router: loginRoutes, maxAge } = require("./routes/login");
+
+const port = process.env.PORT || 8080;
+const app = express();
+
+// Session Configuration
+const sessionStore = new MySQLStore({}, db.pool);
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    store: sessionStore,
+    resave: false,
+    saveUninitialized: false,
+    rolling: true,
+    cookie: {
+      httpOnly: true,
+      maxAge: maxAge,
+    },
+  })
+);
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
-var port = process.env.PORT || 8080; // set our port
+// CORS Configuration
+const corsConfig = {
+  origin: ["http://paralibrary.digital", "http://localhost:3000"],
+  methods: ["GET", "PUT", "POST", "DELETE", "OPTIONS"],
+  credentials: true,
+  maxAge: maxAge,
+};
+app.use(cors(corsConfig));
 
-var libraryRoutes = require("./routes/libraries");
-var categoryRoutes = require("./routes/categories");
-var friendRoutes = require("./routes/friends");
-var loanRoutes = require("./routes/loans");
-var userRoutes = require("./routes/users");
+// Authentication Protection
+const routeProtection = (req, res, next) => {
+  if (req.session.userId == null) {
+    // Unauthorized
+    return res.status(403).end();
+  }
+  next();
+};
 
+// API Routing
 var router = express.Router();
 router
   .use("/", function (req, res, next) {
-    console.log("Something is happening.");
+    if (process.env.NODE_ENV === "development") {
+      console.log(
+        `${req.protocol}://${req.hostname} sent the request: ${req.method} ${req.originalUrl}`
+      );
+    }
     next();
   })
-  .use("/libraries", libraryRoutes)
-  .use("/categories", categoryRoutes)
-  .use("/friends", friendRoutes)
-  .use("/loans", loanRoutes)
-  .use("/users", userRoutes);
+  .use("/libraries", routeProtection, libraryRoutes)
+  .use("/categories", routeProtection, categoryRoutes)
+  .use("/friends", routeProtection, friendRoutes)
+  .use("/loans", routeProtection, loanRoutes)
+  .use("/users", routeProtection, userRoutes)
+  .use("/books", routeProtection, bookRoutes)
+  .use("/login", loginRoutes);
 
 // Routes start with /api
 app.use("/api", router);
