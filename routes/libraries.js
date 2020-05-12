@@ -3,8 +3,8 @@ var router = express.Router();
 var db = require("../db.js");
 
 router.route("/").get(function (req, res) {
-  let userId = req.session.userId;
-  db.libraries.getUsersLibrary(userId).then((library) => {
+  let users = req.body; //req.session.userId;
+  db.libraries.getLibrary(users).then((library) => {
     if (!library) {
       res.statusCode = 404;
       res.end();
@@ -16,7 +16,8 @@ router.route("/").get(function (req, res) {
 });
 
 router.route("/:id").get(function (req, res) {
-  db.libraries.getLibraryById(req.params.id).then((library) => {
+  let users = req.params.id;
+  db.libraries.getLibraryById(/*req.params.id*/ users).then((library) => {
     if (!user) {
       res.statusCode = 404;
       res.end();

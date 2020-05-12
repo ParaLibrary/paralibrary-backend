@@ -32,6 +32,7 @@ app.use(
     },
   })
 );
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -46,6 +47,10 @@ app.use(cors(corsConfig));
 
 // Authentication Protection
 const routeProtection = (req, res, next) => {
+  if (process.env.NODE_ENV === "development") {
+    next();
+    return;
+  }
   if (req.session.userId == null) {
     // Unauthorized
     return res.status(403).end();
