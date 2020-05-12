@@ -12,7 +12,7 @@ const friendRoutes = require("./routes/friends");
 const loanRoutes = require("./routes/loans");
 const userRoutes = require("./routes/users");
 const bookRoutes = require("./routes/books");
-const { router: loginRoutes, maxAge } = require("./routes/login");
+const { router: authRoutes, maxAge } = require("./routes/auth");
 
 const port = process.env.PORT || 8080;
 const app = express();
@@ -75,7 +75,7 @@ router
   .use("/loans", routeProtection, loanRoutes)
   .use("/users", routeProtection, userRoutes)
   .use("/books", routeProtection, bookRoutes)
-  .use("/login", loginRoutes);
+  .use("/auth", authRoutes);
 
 // Routes start with /api
 app.use("/api", router);
