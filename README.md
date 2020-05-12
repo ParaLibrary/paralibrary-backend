@@ -250,12 +250,10 @@ To reject friendship with user 9001,
   "id": 123,
   "owner": {
     "id": 123,
-    "display_name": "Up to 255 chars",
     "name": "Up to 255 chars"
   },
   "requester": {
     "id": 123,
-    "display_name": "Up to 255 chars",
     "name": "Up to 255 chars"
   },
   "book": {
