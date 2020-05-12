@@ -94,7 +94,8 @@ On success, returns status `200` and a **Library Object**. If the current user i
 
 ### Book Object
 
-Visibility can be one of ("public" | "private" | "friends").
+Visibility can be one of ("public" | "private" | "friends").\
+The property `loan` will be the loan with the most recent `request_date`. The **Loan Object** here will not include the book property to avoid infinite recursion.
 
 ```json
 {
@@ -104,7 +105,11 @@ Visibility can be one of ("public" | "private" | "friends").
   "author": "An Author Name",
   "isbn": "1234567890123",
   "summary": "Can be very long",
-  "visibility": "public"
+  "visibility": "public",
+  "loan_count": "123",
+  "loan": {
+    "loan object": "See Loan Object (without the book property)"
+  }
 }
 ```
 
@@ -247,9 +252,9 @@ On success, returns a JSON object containing an array of **User Objects**.
 
 ```json
 [
-  { "user object": "see the users route" },
-  { "user object": "see the users route" },
-  { "user object": "see the users route" }
+  { "user object": "See User Object" },
+  { "user object": "See User Object" },
+  { "user object": "See User Object" }
 ]
 ```
 
@@ -304,7 +309,7 @@ On success, return status `200`. On failure, return status `404`.
 ### Loan Object
 
 The timestamps are return as strings\
-Status can be one of ("pending" | "accepted" | "loaned" | "returned" | "late")
+Status can be one of ("pending" | "accepted" | "loaned" | "returned" | "canceled" | "declined")
 
 ```json
 {
