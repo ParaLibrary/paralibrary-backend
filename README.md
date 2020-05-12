@@ -193,30 +193,33 @@ status is an ENUM and can be referenced by string name ("requested" | "waiting" 
 
 ### Routes
 
-|   Type | Route                | Description                                                                                            |
-| -----: | -------------------- | ------------------------------------------------------------------------------------------------------ |
-|  `GET` | `/friends`           | Returns the current user's friends and people who have requested friendship with the current user      |
-|  `GET` | `/friends/requested` | Returns friends the current user has requested friendship with, but they haven't accepted              |
-|  `GET` | `/friends/:id`       | A temp route that serves real data by specifying a certain user in the url (gets said user's friends). |
-| `POST` | `/friends/:id`       | Set the friendship status from the current user to the target user. See usage below                    |
+|   Type | Route      | Description                                                                                       |
+| -----: | ---------- | ------------------------------------------------------------------------------------------------- |
+|  `GET` | `/friends` | Returns the current user's friends and people who have requested friendship with the current user |
+| `POST` | `/friends` | Set the friendship status from a user to the target user. See usage below                         |
 
 When user A requests friendship with B, A will see the status "requested". B will see the status "waiting". Once B accepts, both A and B will see the status "friends".\
 To change the status of a friendship using the POST request, one must pass in the status and the target user as a json object.\
 To request friendship with user 123,
+
 ```json
 {
   "id": "123",
   "status": "requested"
 }
 ```
+
 To accept friendship with user 9001,
+
 ```json
 {
   "id": 9001,
   "status": "accepted"
 }
 ```
+
 To reject friendship with user 9001,
+
 ```json
 {
   "id": 9001,
