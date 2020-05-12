@@ -23,7 +23,7 @@ pool
 
 var books = (function () {
   return {
-    getBookById: function (bookId) {
+    get: function (bookId) {
       var sql = "SELECT * FROM books WHERE id = ?";
       var inserts = [bookId];
       sql = mysql.format(sql, inserts);
@@ -271,6 +271,79 @@ var libraries = (function () {
   };
 })();
 
+var loans = (function () {
+  return {
+    getLoansById: function (userId) {
+      var sql =
+        "SELECT * FROM loans WHERE (requester_id = ?) OR (owner_contact = ?)";
+      var inserts = [userId, userId];
+      sql = mysql.format(sql, inserts);
+
+      return pool.query(sql).then(([rows, fields]) => {
+        if (!rows || rows.length === 0) {
+          return null;
+        }
+        return rows;
+      });
+    },
+    getLoansByOwner: function (userId) {
+      var sql = "SELECT * FROM loans WHERE owner_contact = ?";
+      var inserts = [userId];
+      sql = mysql.format(sql, inserts);
+
+      return pool.query(sql).then(([rows, fields]) => {
+        if (!rows || rows.length === 0) {
+          return null;
+        }
+        return rows;
+      });
+    },
+    getLoansByRequester: function (userId) {
+      var sql = "SELECT * FROM loans WHERE requester_id = ?";
+      var inserts = [userId];
+      sql = mysql.format(sql, inserts);
+
+      return pool.query(sql).then(([rows, fields]) => {
+        if (!rows || rows.length === 0) {
+          return null;
+        }
+        return rows;
+      });
+    },
+    updateLoanById: function (loan) {
+      var sql =
+        "UPDATE loans SET requester_id = ?, book_id = ?, owner_contact = ?, " +
+        "requester_contact = ?, request_date = ?, accept_date = ?, loan_start_date = ?, " +
+        "loan_end_date = ?, return_date = ?, status = ? " +
+        "WHERE id = ?";
+      var inserts = [
+        loan.requester_id,
+        loan.book_id,
+        loan.owner_contact,
+        loan.requester_contact,
+        loan.request_date,
+        loan.accept_date,
+        loan.loan_start_date,
+        loan.loan_end_date,
+        loan.return_date,
+        loan.status,
+        loan.id,
+      ];
+      sql = mysql.format(sql, inserts);
+
+      return pool.query(sql);
+      ("2020-05-05 05:55:55");
+    },
+    deleteLoan: function (loanId) {
+      var sql = "DELETE from loans WHERE id = ?";
+      var inserts = [loanId];
+      sql = mysql.format(sql, inserts);
+
+      return pool.query(sql);
+    },
+  };
+})();
+
 var users = (function () {
   return {
     getUserByName: function (userName) {
@@ -361,5 +434,6 @@ module.exports = {
   categories,
   friends,
   libraries,
+  loans,
   users,
 };

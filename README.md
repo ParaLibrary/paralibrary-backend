@@ -283,7 +283,7 @@ status is an ENUM and can be referenced by number (0,1,2,3,4) or string name ("p
 |    `GET` | `/loans`           | Get all loans where the user is the owner or requester |
 |   `POST` | `/loans`           | Create a new loan                                      |
 |    `GET` | `/loans/owner`     | Get all the loans where the user is the owner          |
-|    `GET` | `/loans/requester` | Get all the loans where the user is the requester      |
+|    `GET` | `/loans/requester` | Get all the loas where the user is the requester       |
 |    `GET` | `/loans/:id`       | Get a single loan by its id                            |
 |    `PUT` | `/loans/:id`       | Modify a loan by its id                                |
 | `DELETE` | `/loans/:id`       | Delete a loan by its id                                |

@@ -15,17 +15,4 @@ router.route("/").get(function (req, res) {
   });
 });
 
-router.route("/:id").get(function (req, res) {
-  let users = req.params.id;
-  db.libraries.getLibraryById(/*req.params.id*/ users).then((library) => {
-    if (!user) {
-      res.statusCode = 404;
-      res.end();
-      return;
-    }
-    res.statusCode = 200;
-    res.json(library);
-  });
-});
-
 module.exports = router;
