@@ -164,10 +164,116 @@ var friends = (function () {
   };
 })();
 
+var libraries = (function () {
+  return {
+    getLibrary: async function (users) {
+      if (users.user_id === users.target_id) {
+        var userQuery = "SELECT * FROM users WHERE id = ?";
+        var inserts = [users.user_id];
+        userQuery = mysql.format(userQuery, inserts);
+
+        // TODO: Add in categories field to book query.
+        var bookQuery = "SELECT * FROM books WHERE user_id = ?";
+        var inserts = [users.user_id];
+        bookQuery = mysql.format(bookQuery, inserts);
+
+        let user = await pool.query(userQuery).then(([rows, fields]) => {
+          return rows;
+        });
+
+        let books = await pool.query(bookQuery).then(([rows, fields]) => {
+          return rows;
+        });
+
+        for (var i = 0; i < books.length; i++) {
+          var data = books[i].id;
+
+          var loanQuery =
+            `SELECT * FROM loans WHERE book_id = '${data}' ` +
+            `ORDER BY accept_date DESC LIMIT 1`;
+
+          var loans = await pool.query(loanQuery).then(([rows, fields]) => {
+            if (!rows || rows.length === 0) {
+              return null;
+            }
+            return rows[0];
+          });
+
+          var loanCountQuery = `SELECT COUNT (*) as "count" FROM loans WHERE book_id = '${data}'`;
+
+          var loanCount = await pool
+            .query(loanCountQuery)
+            .then(([rows, fields]) => {
+              if (!rows || rows.length === 0) {
+                return null;
+              }
+              return rows[0].count;
+            });
+
+          books[i].loan_count = loanCount;
+          books[i].loan = loans;
+        }
+        return { user, books };
+      } else if (users.user_id != users.target_id) {
+        var userQuery = "SELECT * FROM users WHERE id = ?";
+        var inserts = [users.target_id];
+        userQuery = mysql.format(userQuery, inserts);
+
+        // TODO: Add in categories field to book query.
+        var bookQuery =
+          "SELECT * FROM books b " +
+          "join friendships f on f.user_id = b.user_id " +
+          "WHERE b.user_id = ? AND f.friend_id = ? AND (b.visibility = 'public' " +
+          "OR (b.visibility = 'friends' AND f.status = 'friends'))";
+
+        var inserts = [users.target_id, users.user_id];
+        bookQuery = mysql.format(bookQuery, inserts);
+
+        let user = await pool.query(userQuery).then(([rows, fields]) => {
+          return rows;
+        });
+
+        let books = await pool.query(bookQuery).then(([rows, fields]) => {
+          return rows;
+        });
+
+        for (var i = 0; i < books.length; i++) {
+          var data = books[i].id;
+
+          var loanQuery =
+            `SELECT * FROM loans WHERE book_id = '${data}' ` +
+            `ORDER BY accept_date DESC LIMIT 1`;
+
+          var loans = await pool.query(loanQuery).then(([rows, fields]) => {
+            if (!rows || rows.length === 0) {
+              return null;
+            }
+            return rows[0];
+          });
+
+          var loanCountQuery = `SELECT COUNT (*) as "count" FROM loans WHERE book_id = '${data}'`;
+
+          var loanCount = await pool
+            .query(loanCountQuery)
+            .then(([rows, fields]) => {
+              if (!rows || rows.length === 0) {
+                return null;
+              }
+              return rows[0].count;
+            });
+
+          books[i].loan_count = loanCount;
+          books[i].loan = loans;
+        }
+        return { user, books };
+      }
+    },
+  };
+})();
+
 var users = (function () {
   return {
     getUserByName: function (userName) {
-      var expr = "'" + userName + "%'";
       var sql = `SELECT * FROM users WHERE name LIKE '${userName}%'`;
 
       return pool.query(sql).then(([rows, fields]) => {
@@ -254,5 +360,6 @@ module.exports = {
   books,
   categories,
   friends,
+  libraries,
   users,
 };

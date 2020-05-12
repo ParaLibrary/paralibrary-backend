@@ -4,19 +4,7 @@ var db = require("../db.js");
 
 router.route("/").get(function (req, res) {
   let user = req.body;
-  db.users.getUserByName(user).then((user) => {
-    if (!user) {
-      res.statusCode = 404;
-      res.end();
-      return;
-    }
-    res.statusCode = 200;
-    res.json(user);
-  });
-});
-
-router.route("/:name").get(function (req, res) {
-  db.users.getUserByName(req.params.name).then((user) => {
+  db.users.getUserById(user).then((user) => {
     if (!user) {
       res.statusCode = 404;
       res.end();
@@ -59,4 +47,15 @@ router
     });
   });
 
+router.route("/search/:name").get(function (req, res) {
+  db.users.getUserByName(req.params.name).then((user) => {
+    if (!user) {
+      res.statusCode = 404;
+      res.end();
+      return;
+    }
+    res.statusCode = 200;
+    res.json(user);
+  });
+});
 module.exports = router;

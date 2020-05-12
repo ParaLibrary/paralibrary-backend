@@ -32,7 +32,6 @@ After authenticating, the server will respond with status 200 and this JSON obje
 {
   "user": {
     "id": 123,
-    "display_name": "Up to 255 chars",
     "name": "Up to 255 chars",
     "status": "friends"
   },
@@ -46,16 +45,15 @@ After authenticating, the server will respond with status 200 and this JSON obje
       "summary": "Can be very long",
       "visibility": "public",
       "categories": ["horror", "scifi"],
+      "loan_count": 123,
       "loan": {
         "id": 123,
         "owner": {
           "id": 123,
-          "display_name": "Up to 255 chars",
           "name": "Up to 255 chars"
         },
         "requester": {
           "id": 123,
-          "display_name": "Up to 255 chars",
           "name": "Up to 255 chars"
         },
         "request_date": "2020-04-16T15:38:49.000Z",
@@ -74,24 +72,25 @@ After authenticating, the server will respond with status 200 and this JSON obje
       "summary": "Is a summary",
       "visibility": "private",
       "categories": ["horror", "scifi"],
-      "loan": {
-        "id": 123,
-        "owner": {
+      "loan_count": 123,
+      "loan": [
+        {
           "id": 123,
-          "display_name": "Up to 255 chars",
-          "name": "Up to 255 chars"
-        },
-        "requester": {
-          "id": 123,
-          "display_name": "Up to 255 chars",
-          "name": "Up to 255 chars"
-        },
-        "request_date": "2020-04-16T15:38:49.000Z",
-        "accept_date": "2020-04-16T15:38:49.000Z",
-        "loan_start_date": "2020-04-16T15:38:49.000Z",
-        "loan_end_date": "2020-04-16T15:38:49.000Z",
-        "status": "loaned"
-      }
+          "owner": {
+            "id": 123,
+            "name": "Up to 255 chars"
+          },
+          "requester": {
+            "id": 123,
+            "name": "Up to 255 chars"
+          },
+          "request_date": "2020-04-16T15:38:49.000Z",
+          "accept_date": "2020-04-16T15:38:49.000Z",
+          "loan_start_date": "2020-04-16T15:38:49.000Z",
+          "loan_end_date": "2020-04-16T15:38:49.000Z",
+          "status": "loaned"
+        }
+      ]
     }
   ]
 }
@@ -103,10 +102,22 @@ Loan will be the active (accepted or loaned) loan or null
 
 ### Routes
 
-|  Type | Route            | Description                     |
-| ----: | ---------------- | ------------------------------- |
-| `GET` | `/libraries`     | Get the current user's library  |
-| `GET` | `/libraries/:id` | Get the library for the user id |
+|  Type | Route        | Description                 |
+| ----: | ------------ | --------------------------- |
+| `GET` | `/libraries` | Get a target user's library |
+
+This single route requires in the following json object:
+
+```json
+{
+  "user_id": 1,
+  "target_id": 2
+}
+```
+
+"user_id" represents the current session's user. "target_id" represents the user's library that the route will fetch.\
+If both values are the same number, then the route will fetch the library for that single user.\
+If both values are different, then the route will fetch the target user's library for the current session's user to view.\
 
 ## ---------- Books ----------
 
@@ -148,11 +159,12 @@ Visibility is an ENUM and can be referenced by string name ("public" | "private"
 
 ### Routes
 
-|     Type | Route        | Description                           |
-| -------: | ------------ | ------------------------------------- |
-|    `GET` | `/users/:id` | Get the current user by his/her id    |
-|    `PUT` | `/users/:id` | Modify the user object by his/her id  |
-| `DELETE` | `/users/:id` | Delete the user oobject by his/her id |
+|     Type | Route                 | Description                           |
+| -------: | --------------------- | ------------------------------------- |
+|    `GET` | `/users/:id`          | Get the current user by his/her id    |
+|    `PUT` | `/users/:id`          | Modify the user object by his/her id  |
+| `DELETE` | `/users/:id`          | Delete the user oobject by his/her id |
+|    `GET` | `/users/search/:name` | Get the current user by his/her id    |
 
 ## ---------- Categories ----------
 
@@ -203,20 +215,25 @@ status is an ENUM and can be referenced by string name ("requested" | "waiting" 
 When user A requests friendship with B, A will see the status "requested". B will see the status "waiting". Once B accepts, both A and B will see the status "friends".\
 To change the status of a friendship using the POST request, one must pass in the status and the target user as a json object.\
 To request friendship with user 123,
+
 ```json
 {
   "id": "123",
   "status": "requested"
 }
 ```
+
 To accept friendship with user 9001,
+
 ```json
 {
   "id": 9001,
   "status": "accepted"
 }
 ```
+
 To reject friendship with user 9001,
+
 ```json
 {
   "id": 9001,
@@ -233,12 +250,10 @@ To reject friendship with user 9001,
   "id": 123,
   "owner": {
     "id": 123,
-    "display_name": "Up to 255 chars",
     "name": "Up to 255 chars"
   },
   "requester": {
     "id": 123,
-    "display_name": "Up to 255 chars",
     "name": "Up to 255 chars"
   },
   "book": {
