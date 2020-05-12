@@ -216,13 +216,17 @@ var libraries = (function () {
         return { user, books };
       } else if (users.user_id != users.target_id) {
         var userQuery = "SELECT * FROM users WHERE id = ?";
-        var inserts = [users.user_id];
+        var inserts = [users.target_id];
         userQuery = mysql.format(userQuery, inserts);
 
         // TODO: Add in categories field to book query.
         var bookQuery =
-          "SELECT * FROM books WHERE user_id = ? AND visibility = 'public'";
-        var inserts = [users.user_id];
+          "SELECT * FROM books b " +
+          "join friendships f on f.user_id = b.user_id " +
+          "WHERE b.user_id = ? AND f.friend_id = ? AND (b.visibility = 'public' " +
+          "OR (b.visibility = 'friends' AND f.status = 'friends'))";
+
+        var inserts = [users.target_id, users.user_id];
         bookQuery = mysql.format(bookQuery, inserts);
 
         let user = await pool.query(userQuery).then(([rows, fields]) => {

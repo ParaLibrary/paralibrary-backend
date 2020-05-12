@@ -50,12 +50,10 @@ After authenticating, the server will respond with status 200 and this JSON obje
         "id": 123,
         "owner": {
           "id": 123,
-          "display_name": "Up to 255 chars",
           "name": "Up to 255 chars"
         },
         "requester": {
           "id": 123,
-          "display_name": "Up to 255 chars",
           "name": "Up to 255 chars"
         },
         "request_date": "2020-04-16T15:38:49.000Z",
@@ -80,12 +78,10 @@ After authenticating, the server will respond with status 200 and this JSON obje
           "id": 123,
           "owner": {
             "id": 123,
-            "display_name": "Up to 255 chars",
             "name": "Up to 255 chars"
           },
           "requester": {
             "id": 123,
-            "display_name": "Up to 255 chars",
             "name": "Up to 255 chars"
           },
           "request_date": "2020-04-16T15:38:49.000Z",
@@ -106,10 +102,22 @@ Loan will be the active (accepted or loaned) loan or null
 
 ### Routes
 
-|  Type | Route            | Description                            |
-| ----: | ---------------- | -------------------------------------- |
-| `GET` | `/libraries`     | Get the current user's library         |
-| `GET` | `/libraries/:id` | Get a library for a user by his/her id |
+|  Type | Route        | Description                 |
+| ----: | ------------ | --------------------------- |
+| `GET` | `/libraries` | Get a target user's library |
+
+This single route requires in the following json object:
+
+```json
+{
+  "user_id": 1,
+  "target_id": 2
+}
+```
+
+"user_id" represents the current session's user. "target_id" represents the user's library that the route will fetch.\
+If both values are the same number, then the route will fetch the library for that single user.\
+If both values are different, then the route will fetch the target user's library for the current session's user to view.\
 
 ## ---------- Books ----------
 
