@@ -13,7 +13,7 @@ Any requests except the Authentication requests must include credentials and hav
 
 ## `POST /login`
 
-##### Fetch Format
+### Fetch Format
 
 ```json
 {
@@ -21,7 +21,7 @@ Any requests except the Authentication requests must include credentials and hav
 }
 ```
 
-##### Response
+### Response
 
 After authenticating, the server will respond with status `200` and the following JSON object, indicating the user, whether a new user was created or not, and how long the session lasts. If authentication fails, the server will respond with status `401`.
 
@@ -35,11 +35,11 @@ After authenticating, the server will respond with status `200` and the followin
 
 ## `POST /logout`
 
-##### Fetch Format
+### Fetch Format
 
 None
 
-##### Response
+### Response
 
 The server will respond with status `200` upon successful logout and status `401` if the session no longer exists.
 
@@ -72,21 +72,21 @@ The server will respond with status `200` upon successful logout and status `401
 
 ## `GET /libraries`
 
-##### Fetch Format
+### Fetch Format
 
 None
 
-##### Response
+### Response
 
 On success, returns status `200` and a **Library Object**. On failure, returns status `404`. It will return all books owned by the user, regardless of book status.
 
 ## `GET /libraries/:id`
 
-##### Fetch Format
+### Fetch Format
 
 None
 
-##### Response
+### Response
 
 On success, returns status `200` and a **Library Object**. If the current user is friends with the :id user, it will include all books with visibility "public" and "friends". If they are not friends, it will only return "public" books.
 
@@ -119,11 +119,11 @@ Visibility can be one of ("public" | "private" | "friends").
 
 ## `POST /books`
 
-##### Fetch Format
+### Fetch Format
 
 Expects a **Book Object** as JSON in the body of the request (without id property). The visibility will be public if not specified.
 
-##### Response
+### Response
 
 On success, returns status `200` and following JSON with the id of the inserted book. If the book was not inserted to the db, returns a `404` and no JSON.
 
@@ -135,31 +135,31 @@ On success, returns status `200` and following JSON with the id of the inserted 
 
 ## `GET /books/:id`
 
-##### Fetch Format
+### Fetch Format
 
 None
 
-##### Response
+### Response
 
 On success, returns status `200` and a single **Book Object** matching the :id. If no matching book exists, returns status `404`.
 
 ## `PUT /books/:id`
 
-##### Fetch Format
+### Fetch Format
 
 Expects a full **Book Object** in the body of the request. The book record in the db will be updated to match the given book object.
 
-##### Response
+### Response
 
 On success, returns status `200`. If the book does not exist, returns status `404`.
 
 ## `DELETE /books/:id`
 
-##### Fetch Format
+### Fetch Format
 
 None
 
-##### Response
+### Response
 
 On success, responds with status `200`. On failure, responds with status `404`.
 
@@ -189,41 +189,41 @@ Status will be null if the :id user is either the current user or they have no r
 
 ## `GET /users/:id`
 
-##### Fetch Format
+### Fetch Format
 
 None
 
-##### Response
+### Response
 
 On Success, returns status `200` and a **User Object**.
 
 ## `PUT /users/:id`
 
-##### Fetch Format
+### Fetch Format
 
 Expects a complete **User Object** in the body of the request.
 
-##### Response
+### Response
 
 On success, responds with status `200` and the db record will be updated to match the given object. If the user is not found, returns status `404`.
 
 ## `DELETE /users/:id`
 
-##### Fetch Format
+### Fetch Format
 
 None
 
-##### Response
+### Response
 
 On Success, responds with status `200`. On failure, responds with status `404`.
 
 ## `GET /users/search/:name`
 
-##### Fetch Format
+### Fetch Format
 
 None
 
-##### Response
+### Response
 
 # Friends
 
@@ -237,11 +237,11 @@ None
 
 ## `GET /friends`
 
-##### Fetch Format
+### Fetch Format
 
 None
 
-##### Response
+### Response
 
 On success, returns a JSON object containing an array of **User Objects**.
 
@@ -255,17 +255,17 @@ On success, returns a JSON object containing an array of **User Objects**.
 
 ## `GET /friends/requested`
 
-##### Fetch Format
+### Fetch Format
 
 None
 
-##### Response
+### Response
 
 On success, returns status `200` and JSON array of **User Objects**. Format will be the same as the `GET /friends` route.
 
 ## `POST /friends/:id`
 
-##### Fetch Format
+### Fetch Format
 
 The body of the request must contain a JSON object with the id of the target user a selected action. Action can be one of ("request" | "accept" | "reject").\
 To request friendship with user 123,
@@ -295,7 +295,7 @@ To reject friendship with user 9001,
 }
 ```
 
-##### Response
+### Response
 
 On success, return status `200`. On failure, return status `404`.
 
@@ -340,11 +340,11 @@ Status can be one of ("pending" | "accepted" | "loaned" | "returned" | "late")
 
 ## `GET /loans`
 
-##### Fetch Format
+### Fetch Format
 
 None
 
-##### Response
+### Response
 
 On success, returns status `200` and an array of **Loan Objects**. On failure, return a `404`.
 
@@ -358,61 +358,61 @@ On success, returns status `200` and an array of **Loan Objects**. On failure, r
 
 ## `POST /loans`
 
-##### Fetch Format
+### Fetch Format
 
 Expects a **Loan Object** (without id property) in the body of the request.
 
-##### Response
+### Response
 
 On success, responds with status `200`. On failure, responds with status `404`.
 
 ## `GET /loans/owner`
 
-##### Fetch Format
+### Fetch Format
 
 None
 
-##### Response
+### Response
 
 Same as `GET /loans` route
 
 ## `GET /loans/requester`
 
-##### Fetch Format
+### Fetch Format
 
 None
 
-##### Response
+### Response
 
 Same as `GET /loans` route
 
 ## `GET /loans/:id`
 
-##### Fetch Format
+### Fetch Format
 
 None
 
-##### Response
+### Response
 
 On success, returns status `200` and a single **Loan Object** matching the :id. On failure, returns status `404`.
 
 ## `PUT /loans/:id`
 
-##### Fetch Format
+### Fetch Format
 
 Expects a full **Loan Object** in the body of the request.
 
-##### Response
+### Response
 
 On success, responds with status `200` and the db record will be updated to match the given object. If the loan is not found, returns status `404`.
 
 ## `DELETE /loans/:id`
 
-##### Fetch Format
+### Fetch Format
 
 None
 
-##### Response
+### Response
 
 On success, returns status `200` and deletes the loan record from the db. On failure, returns status `404`.
 
