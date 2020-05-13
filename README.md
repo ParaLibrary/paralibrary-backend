@@ -200,7 +200,7 @@ None
 
 ### Response
 
-On Success, returns status `200` and a **User Object**.
+On Success, returns status `200` and a **User Object**. If the user does not exist, returns `404`. If the :id parameter is not a number, returns `400`.
 
 ## `PUT /users/:id`
 
@@ -210,7 +210,7 @@ Expects a complete **User Object** in the body of the request.
 
 ### Response
 
-On success, responds with status `200` and the db record will be updated to match the given object. If the user is not found, returns status `404`.
+On success, responds with status `200` and the db record will be updated to match the given object. At this time, only the name is malleable. If the user is not found, returns status `404`.
 
 ## `DELETE /users/:id`
 
@@ -229,6 +229,16 @@ On Success, responds with status `200`. On failure, responds with status `404`.
 None
 
 ### Response
+
+On success, returns status `200` and a JSON array of **User Objects** matching `'name%'`. Limit is 20 results
+
+```json
+[
+  { "user object": "See User Object" },
+  { "user object": "See User Object" },
+  { "user object": "See User Object" }
+]
+```
 
 # Friends
 

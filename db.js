@@ -166,123 +166,95 @@ var friends = (function () {
 
 var libraries = (function () {
   return {
-    getLibrary: async function (users) {
-      if (users.user_id === users.target_id) {
-        var userQuery = "SELECT * FROM users WHERE id = ?";
-        var inserts = [users.user_id];
-        userQuery = mysql.format(userQuery, inserts);
+    getLibrary: async function (currentUserId, targetUserId) {
+      let userQuery = "SELECT * FROM users WHERE id = ?";
+      let userInserts;
+      let bookQuery;
+      let bookInserts;
+
+      // Viewing own library
+      if (currentUserId === targetUserId) {
+        userInserts = [currentUserId];
 
         // TODO: Add in categories field to book query.
-        var bookQuery = "SELECT * FROM books WHERE user_id = ?";
-        var inserts = [users.user_id];
-        bookQuery = mysql.format(bookQuery, inserts);
-
-        let user = await pool.query(userQuery).then(([rows, fields]) => {
-          return rows;
-        });
-
-        let books = await pool.query(bookQuery).then(([rows, fields]) => {
-          return rows;
-        });
-
-        for (var i = 0; i < books.length; i++) {
-          var data = books[i].id;
-
-          var loanQuery =
-            `SELECT * FROM loans WHERE book_id = '${data}' ` +
-            `ORDER BY accept_date DESC LIMIT 1`;
-
-          var loans = await pool.query(loanQuery).then(([rows, fields]) => {
-            if (!rows || rows.length === 0) {
-              return null;
-            }
-            return rows[0];
-          });
-
-          var loanCountQuery = `SELECT COUNT (*) as "count" FROM loans WHERE book_id = '${data}'`;
-
-          var loanCount = await pool
-            .query(loanCountQuery)
-            .then(([rows, fields]) => {
-              if (!rows || rows.length === 0) {
-                return null;
-              }
-              return rows[0].count;
-            });
-
-          books[i].loan_count = loanCount;
-          books[i].loan = loans;
-        }
-        return { user, books };
-      } else if (users.user_id != users.target_id) {
-        var userQuery = "SELECT * FROM users WHERE id = ?";
-        var inserts = [users.target_id];
-        userQuery = mysql.format(userQuery, inserts);
+        bookQuery = "SELECT * FROM books WHERE user_id = ?";
+        bookInserts = [currentUserId];
+      }
+      // Viewing other user library
+      else {
+        userInserts = [targetUserId];
 
         // TODO: Add in categories field to book query.
-        var bookQuery =
+        bookQuery =
           "SELECT * FROM books b " +
           "join friendships f on f.user_id = b.user_id " +
           "WHERE b.user_id = ? AND f.friend_id = ? AND (b.visibility = 'public' " +
           "OR (b.visibility = 'friends' AND f.status = 'friends'))";
 
-        var inserts = [users.target_id, users.user_id];
-        bookQuery = mysql.format(bookQuery, inserts);
+        bookInserts = [targetUserId, currentUserId];
+      }
 
-        let user = await pool.query(userQuery).then(([rows, fields]) => {
-          return rows;
+      userQuery = mysql.format(userQuery, userInserts);
+      bookQuery = mysql.format(bookQuery, bookInserts);
+
+      let user = await pool.query(userQuery).then(([rows, fields]) => {
+        return rows ? rows[0] : null;
+      });
+
+      let books = await pool.query(bookQuery).then(([rows, fields]) => {
+        return rows;
+      });
+
+      for (var i = 0; i < books.length; i++) {
+        var bookId = books[i].id;
+
+        var loanQuery =
+          `SELECT * FROM loans WHERE book_id = '${bookId}' ` +
+          `ORDER BY accept_date DESC LIMIT 1`;
+
+        var loans = await pool.query(loanQuery).then(([rows, fields]) => {
+          if (!rows || rows.length === 0) {
+            return null;
+          }
+          return rows[0];
         });
 
-        let books = await pool.query(bookQuery).then(([rows, fields]) => {
-          return rows;
-        });
+        var loanCountQuery = `SELECT COUNT (*) as "count" FROM loans WHERE book_id = '${bookId}'`;
 
-        for (var i = 0; i < books.length; i++) {
-          var data = books[i].id;
-
-          var loanQuery =
-            `SELECT * FROM loans WHERE book_id = '${data}' ` +
-            `ORDER BY accept_date DESC LIMIT 1`;
-
-          var loans = await pool.query(loanQuery).then(([rows, fields]) => {
+        var loanCount = await pool
+          .query(loanCountQuery)
+          .then(([rows, fields]) => {
             if (!rows || rows.length === 0) {
               return null;
             }
-            return rows[0];
+            return rows[0].count;
           });
 
-          var loanCountQuery = `SELECT COUNT (*) as "count" FROM loans WHERE book_id = '${data}'`;
-
-          var loanCount = await pool
-            .query(loanCountQuery)
-            .then(([rows, fields]) => {
-              if (!rows || rows.length === 0) {
-                return null;
-              }
-              return rows[0].count;
-            });
-
-          books[i].loan_count = loanCount;
-          books[i].loan = loans;
-        }
-        return { user, books };
+        books[i].loan_count = loanCount;
+        books[i].loan = loans;
       }
+      return { user, books };
     },
   };
 })();
 
 var users = (function () {
+  const userBaseQuery =
+    "SELECT users.id, name, status " +
+    "FROM users " +
+    "LEFT JOIN friendships ON users.id = friendships.friend_id AND friendships.user_id = ? ";
   return {
-    getUserByName: function (userName) {
-      var sql = `SELECT * FROM users WHERE name LIKE '${userName}%'`;
-
+    getUserByName: function (currentId, nameSearch) {
+      var sql = userBaseQuery + "WHERE name LIKE ? LIMIT 20";
+      var inserts = [currentId, `${nameSearch}%`];
+      sql = mysql.format(sql, inserts);
       return pool.query(sql).then(([rows, fields]) => {
         return rows;
       });
     },
-    getUserById: function (userId) {
-      var sql = "SELECT * FROM users WHERE id = ?";
-      var inserts = [userId];
+    getUserById: function (currentId, targetId) {
+      var sql = userBaseQuery + "WHERE users.id = ?";
+      var inserts = [currentId, targetId];
       sql = mysql.format(sql, inserts);
 
       return pool.query(sql).then(([rows, fields]) => {
@@ -293,6 +265,7 @@ var users = (function () {
       });
     },
     getByGoogleId: function (googleId) {
+      // This query is only used internally, so the formatting of the columns doesn't matter
       var sql = "SELECT * FROM users WHERE google_id = ?";
       var inserts = [googleId];
       sql = mysql.format(sql, inserts);
