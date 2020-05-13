@@ -312,7 +312,7 @@ To reject friendship with user 9001,
 
 ### Response
 
-On success, return status `200`. On failure, return status `404`.
+On success, return status `200`. If the id in the URL does not match the id in the JSON or no action is provided, return `400`. On other failure, return status `404`.
 
 # Loans
 
