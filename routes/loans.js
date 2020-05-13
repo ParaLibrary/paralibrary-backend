@@ -1,108 +1,65 @@
 var express = require("express");
 var router = express.Router();
-var db = require('../db.js');
+var db = require("../db.js");
 
-router.route('/')
-  .get(function(req, res) {
-    res.statusCode = 200;
-    res.json([
-      {
-        "id": 234,
-        "owner_id": 1,
-        "requester_id": 5,
-        "book_id": 3,
-        "request_date": "2020-04-08T15:38:49.000Z",
-        "accept_date": "2020-04-09T15:38:49.000Z",
-        "loan_start_date": "2020-05-01T15:38:49.000Z",
-        "loan_end_date": "2020-05-10T15:38:49.000Z",
-        "status": "accepted"
-      },
-      {
-        "id": 236,
-        "owner_id": 5,
-        "requester_id": 1,
-        "book_id": 2,
-        "request_date": "2020-04-16T15:38:49.000Z",
-        "accept_date": null,
-        "loan_start_date": "2020-06-01T15:38:49.000Z",
-        "loan_end_date": "2020-06-03T15:38:49.000Z",
-        "status": "pending"
-      }
-    ])
-  })
-  .post(function(req, res) {
-    res.statusCode = 200;
-    res.json({
-      "id": 237,
-      "owner_id": 6,
-      "requester_id": 1,
-      "book_id": 1,
-      "request_date": "2020-04-16T15:38:49.000Z",
-      "accept_date": null,
-      "loan_start_date": "2020-06-01T15:38:49.000Z",
-      "loan_end_date": "2020-06-03T15:38:49.000Z",
-      "status": "pending"
-    })
-  })
+const fakeLoan = {
+  id: "123",
+  owner: {
+    id: "123",
+    name: "Owner Name",
+    status: null,
+  },
+  owner_contact: "name@domain.com",
+  requester: {
+    id: "124",
+    name: "Requester Name",
+    status: "friends",
+  },
+  requester_contact: "name@domain.com",
+  book: {
+    id: "123",
+    user_id: "123",
+    title: "A Book Title",
+    author: "An Author Name",
+    isbn: "1234567890123",
+    summary: "Can be very long",
+    visibility: "public",
+  },
+  request_date: "2020-04-16T15:38:49.000Z",
+  accept_date: "2020-04-16T15:38:49.000Z",
+  loan_start_date: "2020-04-16T15:38:49.000Z",
+  loan_end_date: "2020-04-16T15:38:49.000Z",
+  status: "pending",
+};
 
-router.route("/owner")
-  .get(function(req, res) {
-    res.statusCode = 200;
-    res.json([
-      {
-        "id": 234,
-        "owner_id": 1,
-        "requester_id": 5,
-        "book_id": 3,
-        "request_date": "2020-04-08T15:38:49.000Z",
-        "accept_date": "2020-04-09T15:38:49.000Z",
-        "loan_start_date": "2020-05-01T15:38:49.000Z",
-        "loan_end_date": "2020-05-10T15:38:49.000Z",
-        "status": "accepted"
-      }
-    ])
-  })
-
-router.route("/requester")
-  .get(function(req, res) {
-    res.statusCode = 200;
-    res.json([
-      {
-        "id": 236,
-        "owner_id": 5,
-        "requester_id": 1,
-        "book_id": 2,
-        "request_date": "2020-04-16T15:38:49.000Z",
-        "accept_date": null,
-        "loan_start_date": "2020-06-01T15:38:49.000Z",
-        "loan_end_date": "2020-06-03T15:38:49.000Z",
-        "status": "pending"
-      }
-    ])
-  })
-
-router.route("/:loan_id")
+router
+  .route("/")
   .get(function (req, res) {
     res.statusCode = 200;
-    res.json({
-        "id": 234,
-        "owner_id": 1,
-        "requester_id": 5,
-        "book_id": 3,
-        "request_date": "2020-04-08T15:38:49.000Z",
-        "accept_date": "2020-04-09T15:38:49.000Z",
-        "loan_start_date": "2020-05-01T15:38:49.000Z",
-        "loan_end_date": "2020-05-10T15:38:49.000Z",
-        "status": "accepted"
-      })
+    res.json([fakeLoan, fakeLoan, fakeLoan, fakeLoan, fakeLoan]);
+  })
+  .post(function (req, res) {
+    res.status(200).end();
+  });
+
+router.route("/owner").get(function (req, res) {
+  res.status(200).json([fakeLoan, fakeLoan, fakeLoan]);
+});
+
+router.route("/requester").get(function (req, res) {
+  res.status(200).json([fakeLoan, fakeLoan]);
+});
+
+router
+  .route("/:id")
+  .get(function (req, res) {
+    res.status(200).json(fakeLoan);
   })
   .put(function (req, res) {
-    res.statusCode = 200;
-    res.end();
+    res.status(200).end();
   })
   .delete(function (req, res) {
-    res.statusCode = 200;
-    res.end();
+    res.status(200).end();
   });
 
 module.exports = router;

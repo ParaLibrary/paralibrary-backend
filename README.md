@@ -217,7 +217,7 @@ On Success, returns status `200` and a **User Object**. If the user does not exi
 
 ### Fetch Format
 
-Expects a complete **User Object** in the body of the request.
+Expects a partial **User Object** in the body of the request. `status` property is ignored.
 
 ### Response
 
@@ -338,9 +338,11 @@ Status can be one of ("pending" | "accepted" | "loaned" | "returned" | "canceled
   "owner": {
     "user object": "See User Object"
   },
+  "owner_contact": "name@domain.com",
   "requester": {
     "user object": "See User Object"
   },
+  "requester_contact": "name@domain.com",
   "book": {
     "book object": "See Book Object (but without the loan property)"
   },
