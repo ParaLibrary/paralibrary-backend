@@ -43,7 +43,7 @@ None
 
 The server will respond with status `200` upon successful logout and status `401` if the session no longer exists.
 
-# Library
+# Libraries
 
 ### Library Object
 

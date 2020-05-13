@@ -4,7 +4,7 @@ var db = require("../db.js");
 
 router.route("/").get(function (req, res) {
   let user = req.body;
-  db.users.getUserById(user).then((user) => {
+  db.users.getById(user).then((user) => {
     if (!user) {
       res.statusCode = 404;
       res.end();
@@ -23,7 +23,7 @@ router
       res.status(400).end();
       return;
     }
-    db.users.getUserById(req.session.userId, targetId).then((user) => {
+    db.users.getById(req.session.userId, targetId).then((user) => {
       if (!user) {
         res.statusCode = 404;
         res.end();
