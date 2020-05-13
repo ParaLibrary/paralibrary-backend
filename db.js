@@ -128,6 +128,18 @@ var categories = (function () {
 
 var friends = (function () {
   return {
+    getAll: function (currentId) {
+      var sql =
+        "SELECT users.id, name, status " +
+        "FROM users " +
+        "JOIN friendships ON users.id = friendships.friend_id AND friendships.user_id = ? ";
+      var inserts = [currentId];
+      sql = mysql.format(sql, inserts);
+
+      return pool.query(sql).then(([rows, fields]) => {
+        return rows;
+      });
+    },
     get: function (friendId) {
       var sql =
         "SELECT friend_id, status, name " +
