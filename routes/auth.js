@@ -8,7 +8,7 @@ const client = new OAuth2Client(gClientId);
 // Age is 1 hours
 const maxAge = 1000 * 60 * 60;
 
-router.route("/").post((req, res) => {
+router.route("/login").post((req, res) => {
   let token = req.body.idtoken;
   verify(token)
     .then((payload) => {
@@ -44,6 +44,15 @@ router.route("/").post((req, res) => {
     .catch((error) => {
       res.status(401).end();
     });
+});
+
+router.route("/logout").post((req, res) => {
+  if (!req.session) {
+    res.status(401).end();
+    return;
+  }
+  req.session.destroy();
+  res.status(200).end();
 });
 
 async function verify(token) {
