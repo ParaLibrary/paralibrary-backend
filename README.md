@@ -126,11 +126,22 @@ The property `loan` will be the loan with the most recent `request_date`. The **
 
 ### Fetch Format
 
-Expects a **Book Object** as JSON in the body of the request (without id property). The visibility will be public if not specified.
+Expects a partial **Book Object** as JSON in the body of the request. See below for the fields. The visibility will be public if not specified.
+
+```json
+{
+  "user_id": "123",
+  "title": "A Book Title",
+  "author": "An Author Name (optional)",
+  "isbn": "1234567890123 (optional)",
+  "summary": "Can be very long (optional)",
+  "visibility": "public"
+}
+```
 
 ### Response
 
-On success, returns status `200` and following JSON with the id of the inserted book. If the book was not inserted to the db, returns a `404` and no JSON.
+On success, returns status `200` and following JSON with the id of the inserted book. If the required fields are not supplied, returns status `400`. If the book was not inserted to the db for any other reason, returns a `404` and no JSON.
 
 ```json
 {

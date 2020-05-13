@@ -23,7 +23,28 @@ pool
 
 var books = (function () {
   return {
-    getBookById: function (bookId) {
+    getAll: function (currentUserId, targetUserId) {
+      let bookQuery;
+      let bookInserts;
+      if (currentUserId === targetUserId) {
+        bookQuery = "SELECT * FROM books WHERE user_id = ?";
+        bookInserts = [currentUserId];
+      } else {
+        bookQuery =
+          "SELECT * FROM books b " +
+          "join friendships f on f.user_id = b.user_id " +
+          "WHERE b.user_id = ? AND f.friend_id = ? AND (b.visibility = 'public' " +
+          "OR (b.visibility = 'friends' AND f.status = 'friends'))";
+        bookInserts = [targetUserId, currentUserId];
+      }
+
+      bookQuery = mysql.format(bookQuery, bookInserts);
+
+      pool.query(bookQuery).then(([rows, fields]) => {
+        return rows;
+      });
+    },
+    get: function (bookId) {
       var sql = "SELECT * FROM books WHERE id = ?";
       var inserts = [bookId];
       sql = mysql.format(sql, inserts);
