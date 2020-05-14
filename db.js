@@ -286,6 +286,49 @@ var loans = (function () {
         return rows;
       });
     },
+
+    getLoansForUser: async function (userId) {
+      // This will replace getLoansById
+      // Display the id of the loan
+
+      var loanIdQuery =
+        "SELECT id, owner_contact FROM loans WHERE owner_contact = ?";
+      var inserts = [userId];
+      loanIdQuery = mysql.format(loanIdQuery, inserts);
+
+      let loan_id = await pool.query(loanIdQuery).then(([rows, fields]) => {
+        return rows[0];
+      });
+
+      var loanId = loan_id.id;
+      var ownerId = loan_id.owner_contact;
+
+      // Based on that loan's id, display the user's object from the owner_contact field
+      var ownerQuery = `SELECT id, name FROM users WHERE id = '${ownerId}' `;
+
+      var owner = await pool.query(ownerQuery).then(([rows, fields]) => {
+        if (!rows || rows.length === 0) {
+          return null;
+        }
+        return rows[0];
+      });
+
+      // Based on that loan's id, display the requester's information
+      /*var requesterQuery = `SELECT id, name FROM users WHERE id = '${requesterId}' `;
+
+      var requester = await pool
+        .query(requesterQuery)
+        .then(([rows, fields]) => {
+          if (!rows || rows.length === 0) {
+            return null;
+          }
+          return rows[0];
+        });*/
+
+      loan_id.owner = owner;
+      return loan_id;
+    },
+
     getLoansByOwner: function (userId) {
       var sql = "SELECT * FROM loans WHERE owner_contact = ?";
       var inserts = [userId];

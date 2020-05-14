@@ -5,8 +5,8 @@ var db = require("../db.js");
 router
   .route("/")
   .get(function (req, res) {
-    let user = 8;
-    db.loans.getLoansById(user).then((loan) => {
+    let user = 5;
+    db.loans.getLoansForUser(user).then((loan) => {
       if (!loan) {
         res.statusCode = 404;
         res.end();
@@ -16,6 +16,7 @@ router
       res.json(loan);
     });
   })
+
   .post(function (req, res) {
     let loan = req.body;
     db.loans.insert(loan).then(([result, fields]) => {
@@ -30,33 +31,32 @@ router
   });
 
 router.route("/owner").get(function (req, res) {
-  .get(function (req, res) {
-    let user = 1;
-    db.loans.getLoansByOwner(user).then((loan) => {   // Change user to sessions user?
-      if (!loan) {
-        res.statusCode = 404;
-        res.end();
-        return;
-      }
-      res.statusCode = 200;
-      res.json(loan);
-    })
-  })
+  let user = 1;
+  db.loans.getLoansByOwner(user).then((loan) => {
+    // Change user to sessions user?
+    if (!loan) {
+      res.statusCode = 404;
+      res.end();
+      return;
+    }
+    res.statusCode = 200;
+    res.json(loan);
+  });
 });
 
-router.route("/requester")
-  .get(function (req, res) {
-    let user = 1;
-    db.loans.getLoansByRequester(user).then((loan) => {   // Change user to sessions user?
-      if (!loan) {
-        res.statusCode = 404;
-        res.end();
-        return;
-      }
-      res.statusCode = 200;
-      res.json(loan);
-    })
-  })
+router.route("/requester").get(function (req, res) {
+  let user = 1;
+  db.loans.getLoansByRequester(user).then((loan) => {
+    // Change user to sessions user?
+    if (!loan) {
+      res.statusCode = 404;
+      res.end();
+      return;
+    }
+    res.statusCode = 200;
+    res.json(loan);
+  });
+});
 
 router
   .route("/:id")
