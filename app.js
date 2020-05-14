@@ -48,6 +48,7 @@ app.use(cors(corsConfig));
 // Authentication Protection
 const routeProtection = (req, res, next) => {
   if (process.env.NODE_ENV === "development") {
+    req.session.userId = 1;
     next();
     return;
   }
