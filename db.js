@@ -46,8 +46,8 @@ var books = (function () {
     if (mostRecentLoan) {
       var owner = await users.getById(book.user_id, currentUserId);
       var requester = await users.getById(
-        mostRecentLoan.requester_id,
-        currentUserId
+        currentUserId,
+        mostRecentLoan.requester_id
       );
       mostRecentLoan.owner = owner;
       mostRecentLoan.requester = requester;
@@ -83,7 +83,7 @@ var books = (function () {
           return rows;
         });
       if (!retrievedBooks) {
-        return Promise.resolve(retrievedBooks);
+        return Promise.resolve([]);
       }
 
       for (var i = 0; i < retrievedBooks.length; i++) {
