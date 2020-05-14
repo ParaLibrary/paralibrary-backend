@@ -22,7 +22,7 @@ pool
   });
 
 var books = (function () {
-  async function injectLoanInfo(book) {
+  async function injectLoanInfo(book, currentUserId) {
     var loanQuery =
       `SELECT * FROM loans WHERE book_id = '${book.id}' ` +
       `ORDER BY accept_date DESC LIMIT 1`;
@@ -42,6 +42,16 @@ var books = (function () {
       }
       return rows[0].count;
     });
+
+    if (mostRecentLoan) {
+      var owner = await users.getById(book.user_id, currentUserId);
+      var requester = await users.getById(
+        mostRecentLoan.requester_id,
+        currentUserId
+      );
+      mostRecentLoan.owner = owner;
+      mostRecentLoan.requester = requester;
+    }
 
     book.loan_count = loanCount;
     book.loan = mostRecentLoan;
@@ -77,7 +87,10 @@ var books = (function () {
       }
 
       for (var i = 0; i < retrievedBooks.length; i++) {
-        retrievedBooks[i] = await injectLoanInfo(retrievedBooks[i]);
+        retrievedBooks[i] = await injectLoanInfo(
+          retrievedBooks[i],
+          currentUserId
+        );
       }
 
       return Promise.resolve(retrievedBooks);
@@ -91,7 +104,7 @@ var books = (function () {
         if (!rows || rows.length === 0) {
           return null;
         }
-        return injectLoanInfo(rows[0]);
+        return injectLoanInfo(rows[0], currentUserId);
       });
     },
     insert: function (book) {

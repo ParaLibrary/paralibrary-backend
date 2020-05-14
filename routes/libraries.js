@@ -16,6 +16,7 @@ router.route("/").get(function (req, res) {
       res.json(library);
     })
     .catch((error) => {
+      console.error(error);
       res.status(404).end();
     });
 });
