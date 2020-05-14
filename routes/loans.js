@@ -5,7 +5,7 @@ var db = require("../db.js");
 router
   .route("/")
   .get(function (req, res) {
-    let user = 5;
+    let user = 1;
     db.loans.getLoansForUser(user).then((loan) => {
       if (!loan) {
         res.statusCode = 404;
@@ -81,7 +81,6 @@ router
         return;
       }
       res.statusCode = 200;
-      res.json({ id: result.insertId });
     });
   })
 
