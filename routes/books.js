@@ -28,7 +28,7 @@ router.route("/").post(function (req, res) {
 router
   .route("/:id")
   .get(function (req, res) {
-    db.books.get(req.params.id).then((book) => {
+    db.books.get(req.params.id, false).then((book) => {
       if (!book) {
         res.statusCode = 404;
         res.end();

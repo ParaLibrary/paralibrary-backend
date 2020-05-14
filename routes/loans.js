@@ -6,7 +6,7 @@ router
   .route("/")
   .get(function (req, res) {
     let user = 1;
-    db.loans.getLoansForUser(user).then((loan) => {
+    db.loans.getLoansByUserId(user).then((loan) => {
       if (!loan) {
         res.statusCode = 404;
         res.end();
@@ -61,7 +61,7 @@ router.route("/requester").get(function (req, res) {
 router
   .route("/:id")
   .get(function (req, res) {
-    db.loans.getLoansById(req.params.id).then((loan) => {
+    db.loans.getLoanById(req.params.id).then((loan) => {
       if (!loan) {
         res.statusCode = 404;
         res.end();

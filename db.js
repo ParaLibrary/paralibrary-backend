@@ -82,7 +82,7 @@ var books = (function () {
 
       return Promise.resolve(retrievedBooks);
     },
-    get: async function (bookId) {
+    get: async function (bookId, injectLoanData) {
       var sql = "SELECT * FROM books WHERE id = ?";
       var inserts = [bookId];
       sql = mysql.format(sql, inserts);
@@ -90,8 +90,11 @@ var books = (function () {
       return pool.query(sql).then(([rows, fields]) => {
         if (!rows || rows.length === 0) {
           return null;
+        } else if (injectLoanData === true) {
+          return injectLoanInfo(rows[0]);
+        } else if (injectLoanData === false) {
+          return rows[0];
         }
-        return injectLoanInfo(rows[0]);
       });
     },
     insert: function (book) {
@@ -248,52 +251,74 @@ var libraries = (function () {
 
 var loans = (function () {
   return {
-    getLoansById: function (userId) {
-      var sql =
-        "SELECT * FROM loans WHERE (requester_id = ?) OR (owner_contact = ?)";
-      var inserts = [userId, userId];
-      sql = mysql.format(sql, inserts);
+    getLoanById: async function (loanId) {
+      var loanQuery =
+        "SELECT l.id, l.requester_id, l.requester_contact, l.owner_contact, l.book_id, " +
+        "l.request_date, l.accept_date, l.loan_start_date, l.loan_end_date, l.status " +
+        "FROM loans l " +
+        "JOIN books b ON l.book_id = b.id " +
+        "JOIN users u on b.user_id = u.id " +
+        "WHERE l.id = ?";
+      var inserts = [loanId];
+      loanQuery = mysql.format(loanQuery, inserts);
 
-      return pool.query(sql).then(([rows, fields]) => {
-        if (!rows || rows.length === 0) {
-          return null;
-        }
+      let loanData = await pool.query(loanQuery).then(([rows, fields]) => {
         return rows;
       });
+
+      var loanSize = loanData.length;
+
+      for (var i = 0; i < loanSize; i++) {
+        // Do book query then users
+        var bookId = loanData[i].book_id;
+        var bookData = await books.get(bookId, false);
+
+        var bookOwner = bookData.user_id;
+        var userData = await users.getById(bookOwner, bookOwner);
+
+        var requesterOwner = loanData[i].requester_id;
+        var requesterData = await users.getById(bookOwner, requesterOwner);
+
+        loanData[i].book = bookData;
+        loanData[i].user = userData;
+        loanData[i].requester = requesterData;
+      }
+      return loanData;
     },
 
-    getLoansForUser: async function (userId) {
-      // This will replace getLoansById
-      // Display the id of the loan
-
+    getLoansByUserId: async function (userId) {
       var loanQuery =
-        //"SELECT id, owner_contact FROM loans WHERE owner_contact = ?";
-        "SELECT l.id, l.requester_id, l.book_id FROM loans l " +
+        "SELECT l.id, l.requester_id, l.requester_contact, l.owner_contact, l.book_id, " +
+        "l.request_date, l.accept_date, l.loan_start_date, l.loan_end_date, l.status " +
+        "FROM loans l " +
         "JOIN books b ON l.book_id = b.id " +
         "JOIN users u on b.user_id = u.id " +
         "WHERE u.id = ?";
       var inserts = [userId];
       loanQuery = mysql.format(loanQuery, inserts);
 
-      let loan = await pool.query(loanQuery).then(([rows, fields]) => {
+      let loanData = await pool.query(loanQuery).then(([rows, fields]) => {
         return rows;
       });
 
-      var loanSize = loan.length;
+      var loanSize = loanData.length;
 
       for (var i = 0; i < loanSize; i++) {
         // Do book query then users
-        var bookId = loan[i].book_id;
+        var bookId = loanData[i].book_id;
+        var bookData = await books.get(bookId, false);
 
-        var book = await books.get(bookId);
+        var bookOwner = bookData.user_id;
+        var userData = await users.getById(userId, bookOwner);
 
-        /*var ownerId = loan_id[i].owner_contact;
-        var owner = await users.getById(userId, ownerId);
-        loan_id.owner = owner;*/
+        var requesterOwner = loanData[i].requester_id;
+        var requesterData = await users.getById(userId, requesterOwner);
 
-        loan.book = book;
+        loanData[i].book = bookData;
+        loanData[i].user = userData;
+        loanData[i].requester = requesterData;
       }
-      return loan /*, book, owner, etc*/;
+      return loanData;
     },
 
     getLoansByOwner: function (userId) {
@@ -308,6 +333,7 @@ var loans = (function () {
         return rows;
       });
     },
+
     getLoansByRequester: function (userId) {
       var sql = "SELECT * FROM loans WHERE requester_id = ?";
       var inserts = [userId];
