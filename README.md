@@ -4,6 +4,18 @@ The API for the ParaLibrary application\
 All routes start with `http://paralibrary.digital/api`\
 Any requests except the Authentication requests must include credentials and have a valid session. Otherwise, the server will respond with a `403`.
 
+
+----------------------------------
+### Table of Contents
+- [Authentication](#authentication)
+- [Libraries](#libraries)
+- [Books](#books)
+- [Users](#users)
+- [Friends](#friends)
+- [Loans](#loans)
+- [Categories](#categories)
+----------------------------------
+
 # Authentication
 
 |   Type | Route          | Description                    |
@@ -444,7 +456,7 @@ None
 
 On success, returns status `200` and deletes the loan record from the db. On failure, returns status `404`.
 
-# Categories (?)
+# Categories
 
 ### Category Object
 
