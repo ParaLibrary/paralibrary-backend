@@ -1,7 +1,6 @@
 var express = require("express");
 var router = express.Router();
 var db = require("../db.js");
-
 router
   .route("/")
   .get(function (req, res) {
@@ -54,7 +53,6 @@ router.route("/requester").get(function (req, res) {
     res.statusCode = 200;
     res.json(loan);
   });
-});
 
 router
   .route("/:id")
