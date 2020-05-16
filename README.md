@@ -361,7 +361,7 @@ Status can be one of ("pending" | "accepted" | "loaned" | "returned" | "canceled
 |    `GET` | `/loans`           | Get all loans where the user is the owner or requester |
 |   `POST` | `/loans`           | Create a new loan                                      |
 |    `GET` | `/loans/owner`     | Get all the loans where the user is the owner          |
-|    `GET` | `/loans/requester` | Get all the loas where the user is the requester       |
+|    `GET` | `/loans/requester` | Get all the loans where the user is the requester      |
 |    `GET` | `/loans/:id`       | Get a single loan by its id                            |
 |    `PUT` | `/loans/:id`       | Modify a loan by its id                                |
 | `DELETE` | `/loans/:id`       | Delete a loan by its id                                |
