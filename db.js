@@ -43,6 +43,16 @@ var books = (function () {
       return rows[0].count;
     });
 
+    if (mostRecentLoan) {
+      var owner = await users.getById(book.user_id, currentUserId);
+      var requester = await users.getById(
+        currentUserId,
+        mostRecentLoan.requester_id
+      );
+      mostRecentLoan.owner = owner;
+      mostRecentLoan.requester = requester;
+    }
+
     book.loan_count = loanCount;
     book.loan = mostRecentLoan;
     return book;
@@ -73,11 +83,14 @@ var books = (function () {
           return rows;
         });
       if (!retrievedBooks) {
-        return Promise.resolve(retrievedBooks);
+        return Promise.resolve([]);
       }
 
       for (var i = 0; i < retrievedBooks.length; i++) {
-        retrievedBooks[i] = await injectLoanInfo(retrievedBooks[i]);
+        retrievedBooks[i] = await injectLoanInfo(
+          retrievedBooks[i],
+          currentUserId
+        );
       }
 
       return Promise.resolve(retrievedBooks);
