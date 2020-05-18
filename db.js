@@ -22,7 +22,7 @@ pool
   });
 
 var books = (function () {
-  async function injectLoanInfo(book) {
+  async function injectLoanInfo(book, currentUserId) {
     var loanQuery =
       `SELECT * FROM loans WHERE book_id = '${book.id}' ` +
       `ORDER BY accept_date DESC LIMIT 1`;
@@ -95,7 +95,7 @@ var books = (function () {
 
       return Promise.resolve(retrievedBooks);
     },
-    get: async function (bookId, injectLoanData = true) {
+    get: async function (bookId, injectLoanData = true, currentUserId) {
       var sql = "SELECT * FROM books WHERE id = ?";
       var inserts = [bookId];
       sql = mysql.format(sql, inserts);
@@ -104,7 +104,7 @@ var books = (function () {
         if (!rows || rows.length === 0) {
           return null;
         } else if (injectLoanData) {
-          return injectLoanInfo(rows[0]);
+          return injectLoanInfo(rows[0], currentUserId);
         } else {
           return rows[0];
         }
