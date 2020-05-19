@@ -57,7 +57,7 @@ router.route("/owner").get(function (req, res) {
 
 router.route("/requester").get(function (req, res) {
   db.loans
-    .getAllLoansByRequester(req.session.userId)
+    .getLoansByRequester(req.session.userId)
     .then((loan) => {
       if (!loan) {
         res.statusCode = 404;

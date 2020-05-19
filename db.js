@@ -245,9 +245,6 @@ var friends = (function () {
         mysql.format(deleteStatement, [friendId, userId]),
       ]);
     },
-
-    // Quick note: We can tighten up these functions once we get sessions going, since sessions will provide us with
-    // both the target user's id, and the sender's id. One sql query can be made with those each time instead of two.
   };
 })();
 
@@ -270,16 +267,16 @@ var loans = (function () {
       );
     },
     getLoansByOwner: function (userId) {
-      return loans.baseQuery(`WHERE u.id = '${userId}'`);
+      return loans.baseQuery(`WHERE u.id = '${userId}'`, userId);
     },
     getLoansByRequester: function (userId) {
-      return loans.baseQuery(`WHERE l.requester_id = '${userId}'`);
+      return loans.baseQuery(`WHERE l.requester_id = '${userId}'`, userId);
     },
     getLoanById: function (loanId) {
-      return loans.baseQuery(`WHERE l.id = '${loanId}'`);
+      return loans.baseQuery(`WHERE l.id = '${(loanId, 0)}'`);
     },
 
-    baseQuery: async function (whereClause) {
+    baseQuery: async function (whereClause, userId) {
       var loanQuery =
         "SELECT l.id, l.requester_id, l.requester_contact, l.owner_contact, l.book_id, " +
         "l.request_date, l.accept_date, l.loan_start_date, l.loan_end_date, l.status " +
@@ -296,7 +293,7 @@ var loans = (function () {
 
       for (var i = 0; i < loanSize; i++) {
         var bookId = loanData[i].book_id;
-        var bookData = await books.get(bookId, false);
+        var bookData = await books.get(bookId, false, userId);
         var bookOwner = bookData.user_id;
 
         var userData = await users.getById(bookOwner, bookOwner);

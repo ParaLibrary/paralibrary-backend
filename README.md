@@ -4,6 +4,20 @@ The API for the ParaLibrary application\
 All routes start with `http://paralibrary.digital/api`\
 Any requests except the Authentication requests must include credentials and have a valid session. Otherwise, the server will respond with a `403`.
 
+---
+
+### Table of Contents
+
+- [Authentication](#authentication)
+- [Libraries](#libraries)
+- [Books](#books)
+- [Users](#users)
+- [Friends](#friends)
+- [Loans](#loans)
+- [Categories](#categories)
+
+---
+
 # Authentication
 
 |   Type | Route          | Description                    |
@@ -196,12 +210,14 @@ Status will be null if the :id user is either the current user or they have no r
 
 ### Routes
 
-|     Type | Route                 | Description                                |
-| -------: | --------------------- | ------------------------------------------ |
-|    `GET` | `/users/:id`          | Get user object by id                      |
-|    `PUT` | `/users/:id`          | Modify the user object by id               |
-| `DELETE` | `/users/:id`          | Delete the user object by id               |
-|    `GET` | `/users/search/:name` | Get list of users matching the name string |
+| Type | Route | Description |
+| ---: | ----- | ----------- |
+
+
+| `DELETE` | `/users` | Delete the current user by id |
+| `GET` | `/users/:id` | Get user object by id |
+| `PUT` | `/users/:id` | Modify the user object by id |
+| `GET` | `/users/search/:name` | Get list of users matching the name string |
 
 ## `GET /users/:id`
 
@@ -444,7 +460,7 @@ None
 
 On success, returns status `200` and deletes the loan record from the db. On failure, returns status `404`.
 
-# Categories (?)
+# Categories
 
 ### Category Object
 
