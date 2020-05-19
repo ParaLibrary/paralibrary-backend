@@ -211,8 +211,6 @@ Status will be null if the :id user is either the current user or they have no r
 
 | Type | Route | Description |
 | ---: | ----- | ----------- |
-
-
 | `DELETE` | `/users` | Delete the current user by id |
 | `GET` | `/users/:id` | Get user object by id |
 | `PUT` | `/users/:id` | Modify the user object by id |
