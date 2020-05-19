@@ -4,15 +4,28 @@ var db = require("../db.js");
 
 router.route("/").get(function (req, res) {
   let user = req.body;
-  db.users.getById(user).then((user) => {
-    if (!user) {
-      res.statusCode = 404;
-      res.end();
-      return;
-    }
-    res.statusCode = 200;
-    res.json(user);
-  });
+  db.users
+    .getById(user)
+    .then((user) => {
+      if (!user) {
+        res.statusCode = 404;
+        res.end();
+        return;
+      }
+      res.statusCode = 200;
+      res.json(user);
+    })
+
+    .delete(function (req, res) {
+      db.users
+        .delete(req.session.userId)
+        .then(() => {
+          res.status(200).end();
+        })
+        .catch((e) => {
+          res.status(404).end();
+        });
+    });
 });
 
 router
@@ -33,6 +46,7 @@ router
       res.json(user);
     });
   })
+
   .put(function (req, res) {
     let user = req.body;
     db.users
@@ -43,16 +57,6 @@ router
           res.end();
           return;
         }
-        res.status(200).end();
-      })
-      .catch((e) => {
-        res.status(404).end();
-      });
-  })
-  .delete(function (req, res) {
-    db.users
-      .delete(req.params.id)
-      .then(() => {
         res.status(200).end();
       })
       .catch((e) => {
@@ -71,4 +75,5 @@ router.route("/search/:name").get(function (req, res) {
     res.json(user);
   });
 });
+
 module.exports = router;

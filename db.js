@@ -95,7 +95,7 @@ var books = (function () {
 
       return Promise.resolve(retrievedBooks);
     },
-    get: async function (bookId) {
+    get: async function (bookId, injectLoanData = true, currentUserId) {
       var sql = "SELECT * FROM books WHERE id = ?";
       var inserts = [bookId];
       sql = mysql.format(sql, inserts);
@@ -103,8 +103,11 @@ var books = (function () {
       return pool.query(sql).then(([rows, fields]) => {
         if (!rows || rows.length === 0) {
           return null;
+        } else if (injectLoanData) {
+          return injectLoanInfo(rows[0], currentUserId);
+        } else {
+          return rows[0];
         }
-        return injectLoanInfo(rows[0], currentUserId);
       });
     },
     insert: function (book) {
@@ -242,9 +245,6 @@ var friends = (function () {
         mysql.format(deleteStatement, [friendId, userId]),
       ]);
     },
-
-    // Quick note: We can tighten up these functions once we get sessions going, since sessions will provide us with
-    // both the target user's id, and the sender's id. One sql query can be made with those each time instead of two.
   };
 })();
 
@@ -255,6 +255,89 @@ var libraries = (function () {
       let libBooks = await books.getAll(currentUserId, targetUserId);
 
       return { user: libUser, books: libBooks };
+    },
+  };
+})();
+
+var loans = (function () {
+  return {
+    getAllLoans: function (userId) {
+      return loans.baseQuery(
+        `WHERE (u.id = '${userId}') OR (requester_id = '${userId}')`
+      );
+    },
+    getLoansByOwner: function (userId) {
+      return loans.baseQuery(`WHERE u.id = '${userId}'`, userId);
+    },
+    getLoansByRequester: function (userId) {
+      return loans.baseQuery(`WHERE l.requester_id = '${userId}'`, userId);
+    },
+    getLoanById: function (loanId) {
+      return loans.baseQuery(`WHERE l.id = '${(loanId, 0)}'`);
+    },
+
+    baseQuery: async function (whereClause, userId) {
+      var loanQuery =
+        "SELECT l.id, l.requester_id, l.requester_contact, l.owner_contact, l.book_id, " +
+        "l.request_date, l.accept_date, l.loan_start_date, l.loan_end_date, l.status " +
+        "FROM loans l " +
+        "JOIN books b ON l.book_id = b.id " +
+        "JOIN users u on b.user_id = u.id " +
+        whereClause;
+
+      let loanData = await pool.query(loanQuery).then(([rows, fields]) => {
+        return rows;
+      });
+
+      var loanSize = loanData.length;
+
+      for (var i = 0; i < loanSize; i++) {
+        var bookId = loanData[i].book_id;
+        var bookData = await books.get(bookId, false, userId);
+        var bookOwner = bookData.user_id;
+
+        var userData = await users.getById(bookOwner, bookOwner);
+        var requesterOwner = loanData[i].requester_id;
+
+        var requesterData = await users.getById(bookOwner, requesterOwner);
+
+        loanData[i].book = bookData;
+        loanData[i].owner = userData;
+        loanData[i].requester = requesterData;
+      }
+      return loanData;
+    },
+
+    updateLoanById: function (loan) {
+      var sql =
+        "UPDATE loans SET requester_id = ?, book_id = ?, owner_contact = ?, " +
+        "requester_contact = ?, request_date = ?, accept_date = ?, loan_start_date = ?, " +
+        "loan_end_date = ?, return_date = ?, status = ? " +
+        "WHERE id = ?";
+      var inserts = [
+        loan.requester_id,
+        loan.book_id,
+        loan.owner_contact,
+        loan.requester_contact,
+        loan.request_date,
+        loan.accept_date,
+        loan.loan_start_date,
+        loan.loan_end_date,
+        loan.return_date,
+        loan.status,
+        loan.id,
+      ];
+      sql = mysql.format(sql, inserts);
+
+      return pool.query(sql);
+    },
+
+    deleteLoan: function (loanId) {
+      var sql = "DELETE from loans WHERE id = ?";
+      var inserts = [loanId];
+      sql = mysql.format(sql, inserts);
+
+      return pool.query(sql);
     },
   };
 })();
@@ -355,5 +438,6 @@ module.exports = {
   categories,
   friends,
   libraries,
+  loans,
   users,
 };

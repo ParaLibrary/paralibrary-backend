@@ -7,6 +7,7 @@ Any requests except the Authentication requests must include credentials and hav
 
 ----------------------------------
 ### Table of Contents
+
 - [Authentication](#authentication)
 - [Libraries](#libraries)
 - [Books](#books)
@@ -208,12 +209,14 @@ Status will be null if the :id user is either the current user or they have no r
 
 ### Routes
 
-|     Type | Route                 | Description                                |
-| -------: | --------------------- | ------------------------------------------ |
-|    `GET` | `/users/:id`          | Get user object by id                      |
-|    `PUT` | `/users/:id`          | Modify the user object by id               |
-| `DELETE` | `/users/:id`          | Delete the user object by id               |
-|    `GET` | `/users/search/:name` | Get list of users matching the name string |
+| Type | Route | Description |
+| ---: | ----- | ----------- |
+
+
+| `DELETE` | `/users` | Delete the current user by id |
+| `GET` | `/users/:id` | Get user object by id |
+| `PUT` | `/users/:id` | Modify the user object by id |
+| `GET` | `/users/search/:name` | Get list of users matching the name string |
 
 ## `GET /users/:id`
 
