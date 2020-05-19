@@ -4,8 +4,8 @@ The API for the ParaLibrary application\
 All routes start with `http://paralibrary.digital/api`\
 Any requests except the Authentication requests must include credentials and have a valid session. Otherwise, the server will respond with a `403`.
 
----
 
+----------------------------------
 ### Table of Contents
 
 - [Authentication](#authentication)
@@ -15,8 +15,7 @@ Any requests except the Authentication requests must include credentials and hav
 - [Friends](#friends)
 - [Loans](#loans)
 - [Categories](#categories)
-
----
+----------------------------------
 
 # Authentication
 

@@ -17,6 +17,20 @@ const { router: authRoutes, maxAge } = require("./routes/auth");
 const port = process.env.PORT || 8080;
 const app = express();
 
+let devUserId = 1;
+if (process.env.NODE_ENV === "development") {
+  if (!process.env.DEV_USER_ID) {
+    console.error(
+      `You need to add this line to the .env file: DEV_USER_ID=_\nWhere _ is the user id you are testing as.`
+    );
+    throw new Error();
+  }
+  devUserId = process.env.DEV_USER_ID;
+  console.log(
+    `All incoming requests will be interpreted as coming from user ${devUserId}`
+  );
+}
+
 // Session Configuration
 const sessionStore = new MySQLStore({}, db.pool);
 app.use(
@@ -48,7 +62,7 @@ app.use(cors(corsConfig));
 // Authentication Protection
 const routeProtection = (req, res, next) => {
   if (process.env.NODE_ENV === "development") {
-    req.session.userId = 1;
+    req.session.userId = devUserId;
     next();
     return;
   }
