@@ -2,11 +2,11 @@ var express = require("express");
 var router = express.Router();
 var db = require("../db.js");
 
-router.route("/").get(function (req, res) {
-  let user = req.body;
-  db.users
-    .getById(user)
-    .then((user) => {
+router
+  .route("/")
+  .get(function (req, res) {
+    let user = req.body;
+    db.users.getById(user).then((user) => {
       if (!user) {
         res.statusCode = 404;
         res.end();
@@ -14,19 +14,19 @@ router.route("/").get(function (req, res) {
       }
       res.statusCode = 200;
       res.json(user);
-    })
-
-    .delete(function (req, res) {
-      db.users
-        .delete(req.session.userId)
-        .then(() => {
-          res.status(200).end();
-        })
-        .catch((e) => {
-          res.status(404).end();
-        });
     });
-});
+  })
+
+  .delete(function (req, res) {
+    db.users
+      .delete(req.session.userId)
+      .then(() => {
+        res.status(200).end();
+      })
+      .catch((e) => {
+        res.status(404).end();
+      });
+  });
 
 router
   .route("/:id")
