@@ -274,6 +274,7 @@ On success, returns status `200` and a JSON array of **User Objects** matching `
 | -----: | -------------------- | ------------------------------------------------------------------------------------------------- |
 |  `GET` | `/friends`           | Returns the current user's friends and people who have requested friendship with the current user |
 |  `GET` | `/friends/requested` | Returns friends the current user has requested friendship with, but they haven't responded        |
+|  `GET` | `/friends/:id`       | Gets all the friends that a target user is friends with                                           |
 | `POST` | `/friends/:id`       | Set the friendship status from the current user to the target user                                |
 
 ## `GET /friends`
