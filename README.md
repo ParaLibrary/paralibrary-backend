@@ -218,8 +218,6 @@ Status will be null if the :id user is either the current user or they have no r
 | `DELETE` | `/users/:id`          | Delete the user user by id. O              |
 |    `GET` | `/users/search/:name` | Get list of users matching the name string |
 
-As a quick note, the delete route will only work if the id passed in is the same as the current user's id. otherwise, a `403` status will be returned.
-
 ## `GET /users/:id`
 
 ### Fetch Format
@@ -244,7 +242,7 @@ On success, responds with status `200` and the db record will be updated to matc
 
 ### Fetch Format
 
-None
+The delete route will only work if the id passed in is the same as the current user's id. otherwise, a `403` status will be returned.
 
 ### Response
 
