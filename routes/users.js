@@ -54,11 +54,13 @@ router
   .delete(function (req, res) {
     db.users.delete(req.params.id, req.session.userId).then((user) => {
       if (!user) {
-        res.statusCode = 404;
+        res.statusCode = 403;
         res.end();
         return;
       }
+
       res.statusCode = 200;
+      res.end();
     });
   });
 
