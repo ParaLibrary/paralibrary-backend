@@ -48,20 +48,18 @@ router
       })
       .catch((e) => {
         res.status(404).end();
-      })
-
-      .delete(function (req, res) {
-        db.users
-          .delete(req.params.id, /*req.session.userId*/ 2)
-          .then((user) => {
-            if (!user) {
-              res.statusCode = 404;
-              res.end();
-              return;
-            }
-            res.statusCode = 200;
-          });
       });
+  })
+
+  .delete(function (req, res) {
+    db.users.delete(req.params.id, req.session.userId).then((user) => {
+      if (!user) {
+        res.statusCode = 404;
+        res.end();
+        return;
+      }
+      res.statusCode = 200;
+    });
   });
 
 router.route("/search/:name").get(function (req, res) {
