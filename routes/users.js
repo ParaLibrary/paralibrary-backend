@@ -52,16 +52,19 @@ router
   })
 
   .delete(function (req, res) {
-    db.users.delete(req.params.id, req.session.userId).then((user) => {
-      if (!user) {
-        res.statusCode = 403;
-        res.end();
-        return;
-      }
-
-      res.statusCode = 200;
+    if (req.params.id === req.session.userId) {
+      db.users
+        .delete(req.params.id, req.session.userId)
+        .then(() => {
+          res.status(200).end();
+        })
+        .catch((e) => {
+          res.status(404).end();
+        });
+    } else {
+      res.statusCode = 403;
       res.end();
-    });
+    }
   });
 
 router.route("/search/:name").get(function (req, res) {
