@@ -54,7 +54,7 @@ router
   .delete(function (req, res) {
     if (req.params.id === req.session.userId) {
       db.users
-        .delete(req.params.id, req.session.userId)
+        .delete(req.session.userId)
         .then(() => {
           res.status(200).end();
         })
