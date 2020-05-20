@@ -400,11 +400,7 @@ var users = (function () {
       var inserts = [userId];
       sql = mysql.format(sql, inserts);
 
-      if (userId === currentUserId) {
-        return pool.query(sql);
-      } else {
-        return null;
-      }
+      return pool.query(sql);
     },
   };
 })();
