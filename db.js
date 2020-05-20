@@ -395,12 +395,16 @@ var users = (function () {
 
       return pool.query(sql);
     },
-    delete: function (userId) {
+    delete: function (userId, currentUserId) {
       var sql = "DELETE FROM users WHERE id = ?";
       var inserts = [userId];
       sql = mysql.format(sql, inserts);
 
-      return pool.query(sql);
+      if (userId === currentUserId) {
+        return pool.query(sql);
+      } else {
+        return null;
+      }
     },
   };
 })();

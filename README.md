@@ -213,10 +213,12 @@ Status will be null if the :id user is either the current user or they have no r
 |     Type | Route                 | Description                                |
 | -------: | --------------------- | ------------------------------------------ |
 |    `GET` | `/users`              | Get the current user's object by id        |
-| `DELETE` | `/users`              | Delete the current user by id              |
 |    `GET` | `/users/:id`          | Get user object by id                      |
 |    `PUT` | `/users/:id`          | Modify the user object by id               |
+| `DELETE` | `/users/:id`          | Delete the user user by id. O              |
 |    `GET` | `/users/search/:name` | Get list of users matching the name string |
+
+As a quick note, the delete route will only work if the id passed in is the same as the current user's id. otherwise, a `403` status will be returned.
 
 ## `GET /users/:id`
 
