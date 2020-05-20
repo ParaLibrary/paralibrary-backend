@@ -4,28 +4,15 @@ var db = require("../db.js");
 
 router.route("/").get(function (req, res) {
   let user = req.body;
-  db.users
-    .getById(user)
-    .then((user) => {
-      if (!user) {
-        res.statusCode = 404;
-        res.end();
-        return;
-      }
-      res.statusCode = 200;
-      res.json(user);
-    })
-
-    .delete(function (req, res) {
-      db.users
-        .delete(req.session.userId)
-        .then(() => {
-          res.status(200).end();
-        })
-        .catch((e) => {
-          res.status(404).end();
-        });
-    });
+  db.users.getById(user).then((user) => {
+    if (!user) {
+      res.statusCode = 404;
+      res.end();
+      return;
+    }
+    res.statusCode = 200;
+    res.json(user);
+  });
 });
 
 router
@@ -62,6 +49,22 @@ router
       .catch((e) => {
         res.status(404).end();
       });
+  })
+
+  .delete(function (req, res) {
+    if (req.params.id === req.session.userId) {
+      db.users
+        .delete(req.session.userId)
+        .then(() => {
+          res.status(200).end();
+        })
+        .catch((e) => {
+          res.status(404).end();
+        });
+    } else {
+      res.statusCode = 403;
+      res.end();
+    }
   });
 
 router.route("/search/:name").get(function (req, res) {

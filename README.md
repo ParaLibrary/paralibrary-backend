@@ -4,8 +4,8 @@ The API for the ParaLibrary application\
 All routes start with `http://paralibrary.digital/api`\
 Any requests except the Authentication requests must include credentials and have a valid session. Otherwise, the server will respond with a `403`.
 
+---
 
-----------------------------------
 ### Table of Contents
 
 - [Authentication](#authentication)
@@ -15,7 +15,8 @@ Any requests except the Authentication requests must include credentials and hav
 - [Friends](#friends)
 - [Loans](#loans)
 - [Categories](#categories)
-----------------------------------
+
+---
 
 # Authentication
 
@@ -209,12 +210,13 @@ Status will be null if the :id user is either the current user or they have no r
 
 ### Routes
 
-| Type | Route | Description |
-| ---: | ----- | ----------- |
-| `DELETE` | `/users` | Delete the current user by id |
-| `GET` | `/users/:id` | Get user object by id |
-| `PUT` | `/users/:id` | Modify the user object by id |
-| `GET` | `/users/search/:name` | Get list of users matching the name string |
+|     Type | Route                 | Description                                |
+| -------: | --------------------- | ------------------------------------------ |
+|    `GET` | `/users`              | Get the current user's object by id        |
+|    `GET` | `/users/:id`          | Get user object by id                      |
+|    `PUT` | `/users/:id`          | Modify the user object by id               |
+| `DELETE` | `/users/:id`          | Delete the user user by id. O              |
+|    `GET` | `/users/search/:name` | Get list of users matching the name string |
 
 ## `GET /users/:id`
 
@@ -240,7 +242,7 @@ On success, responds with status `200` and the db record will be updated to matc
 
 ### Fetch Format
 
-None
+The delete route will only work if the id passed in is the same as the current user's id. otherwise, a `403` status will be returned.
 
 ### Response
 
