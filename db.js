@@ -395,7 +395,7 @@ var users = (function () {
 
       return pool.query(sql);
     },
-    delete: function (userId, currentUserId) {
+    delete: function (userId) {
       var sql = "DELETE FROM users WHERE id = ?";
       var inserts = [userId];
       sql = mysql.format(sql, inserts);
