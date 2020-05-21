@@ -215,6 +215,7 @@ var friends = (function () {
         return rows;
       });
     },
+
     get: function (friendId) {
       var sql =
         "SELECT friend_id, status, name " +
@@ -228,6 +229,39 @@ var friends = (function () {
         return rows;
       });
     },
+
+    getFriendsofFriend: async function (friendId) {
+      var friendData = await friends.getAll(friendId);
+
+      var friendSize = friendData.length;
+
+      for (var i = 0; i < friendSize; i++) {
+        var targetFriend = friendData[i].id;
+        //var friendOfFriend = await friends.getAll(targetFriend);
+
+        var friendQuery =
+          "SELECT u.id, u.name, f.status " +
+          "FROM users u " +
+          "JOIN friendships f ON (u.id = f.friend_id) " +
+          "AND (f.user_id = ?) AND (users.id != ?)";
+
+        var inserts = [targetFriend, friendId];
+        friendQuery = mysql.format(friendQuery, inserts);
+
+        var friendOfFriend = await pool
+          .query(friendQuery)
+          .then(([rows, fields]) => {
+            return rows;
+          });
+
+        friendData[i].friend_of_friend = friendOfFriend;
+
+        //friendData[i].friend_of_friend = friendOfFriend;
+      }
+
+      return friendData;
+    },
+
     update: async function (userId, friendId, userStatus, friendStatus) {
       const insertUpdate =
         "INSERT INTO friendships VALUES (?,?,?) ON DUPLICATE KEY UPDATE status = VALUES(status)";
@@ -236,6 +270,7 @@ var friends = (function () {
         mysql.format(insertUpdate, [friendId, userId, friendStatus]),
       ]);
     },
+
     delete: function (userId, friendId) {
       // Will delete the requestee's row
       const deleteStatement =
@@ -308,7 +343,14 @@ var loans = (function () {
       return loanData;
     },
 
-    updateLoanById: function (loan) {
+    getLoanStatus: async function (loanId) {
+      var sql = "GET status FROM loans WHERE id = ?";
+      sql = mysql.format(sql, loanId);
+
+      return pool.query(sql);
+    },
+
+    updateLoanById: async function (loan) {
       var sql =
         "UPDATE loans SET requester_id = ?, book_id = ?, owner_contact = ?, " +
         "requester_contact = ?, request_date = ?, accept_date = ?, loan_start_date = ?, " +
@@ -329,7 +371,13 @@ var loans = (function () {
       ];
       sql = mysql.format(sql, inserts);
 
-      return pool.query(sql);
+      var currentLoan = await loans.getLoanStatus(loan.id);
+
+      if (currentLoan.status === "requested") {
+        return null;
+      } else {
+        return pool.query(sql);
+      }
     },
 
     deleteLoan: function (loanId) {
@@ -395,12 +443,16 @@ var users = (function () {
 
       return pool.query(sql);
     },
-    delete: function (userId) {
+    delete: function (userId, currentUserId) {
       var sql = "DELETE FROM users WHERE id = ?";
       var inserts = [userId];
       sql = mysql.format(sql, inserts);
 
-      return pool.query(sql);
+      if (userId === currentUserId) {
+        return pool.query(sql);
+      } else {
+        return null;
+      }
     },
   };
 })();
