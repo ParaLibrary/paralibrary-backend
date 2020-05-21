@@ -120,6 +120,7 @@ The property `loan` will be the loan with the most recent `request_date`. The **
   "isbn": "1234567890123",
   "summary": "Can be very long",
   "visibility": "public",
+  "categories": ["Horror", "Favorites", "Sci Fi"],
   "loan_count": "123",
   "loan": {
     "loan object": "See Loan Object (without the book property)"
@@ -177,7 +178,9 @@ On success, returns status `200` and a single **Book Object** matching the :id. 
 
 ### Fetch Format
 
-Expects a full **Book Object** in the body of the request. The book record in the db will be updated to match the given book object.
+Expects a full **Book Object** in the body of the request. The book record in the db will be updated to match the given book object.\
+Categories are updated\
+Loan information is NOT updated through this route\
 
 ### Response
 
@@ -458,25 +461,3 @@ None
 ### Response
 
 On success, returns status `200` and deletes the loan record from the db. On failure, returns status `404`.
-
-# Categories
-
-### Category Object
-
-```json
-{
-  "id": 123,
-  "user_id": 123,
-  "name": "Up to 255 chars"
-}
-```
-
-### Routes
-
-|     Type | Route             | Description                                 |
-| -------: | ----------------- | ------------------------------------------- |
-|    `GET` | `/categories`     | Get all the categories for the current user |
-|   `POST` | `/categories`     | Create a new category                       |
-|    `GET` | `/categories/:id` | Get a single category object by its id      |
-|    `PUT` | `/categories/:id` | Modify a category object by its id          |
-| `DELETE` | `/categories/:id` | Delete a category object by its id          |

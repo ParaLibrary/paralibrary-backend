@@ -23,39 +23,55 @@ pool
 
 var books = (function () {
   async function injectLoanInfo(book, currentUserId) {
-    var loanQuery =
-      `SELECT * FROM loans WHERE book_id = '${book.id}' ` +
-      `ORDER BY accept_date DESC LIMIT 1`;
-
-    var mostRecentLoan = await pool.query(loanQuery).then(([rows, fields]) => {
-      if (!rows || rows.length === 0) {
-        return null;
-      }
-      return rows[0];
-    });
-
-    var loanCountQuery = `SELECT COUNT (*) as "count" FROM loans WHERE book_id = '${book.id}'`;
-
-    var loanCount = await pool.query(loanCountQuery).then(([rows, fields]) => {
+    // Get Loan Count
+    let loanCountQuery = `SELECT COUNT (*) as "count" FROM loans WHERE book_id = '${book.id}'`;
+    let loanCount = await pool.query(loanCountQuery).then(([rows, fields]) => {
       if (!rows || rows.length === 0) {
         return null;
       }
       return rows[0].count;
     });
 
-    if (mostRecentLoan) {
-      var owner = await users.getById(book.user_id, currentUserId);
-      var requester = await users.getById(
-        currentUserId,
-        mostRecentLoan.requester_id
-      );
-      mostRecentLoan.owner = owner;
-      mostRecentLoan.requester = requester;
-    }
+    let loanQuery =
+      `SELECT * FROM loans WHERE book_id = '${book.id}' ` +
+      `ORDER BY accept_date DESC LIMIT 1`;
 
-    book.loan_count = loanCount;
-    book.loan = mostRecentLoan;
-    return book;
+    // Get most recent loan
+    return pool
+      .query(loanQuery)
+      .then(([rows, fields]) => {
+        if (!rows || rows.length === 0) {
+          return null;
+        }
+        return rows[0];
+      })
+      .then(async (loan) => {
+        if (loan) {
+          var owner = await users.getById(book.user_id, currentUserId);
+          var requester = await users.getById(currentUserId, loan.requester_id);
+          loan.owner = owner;
+          loan.requester = requester;
+        }
+
+        book.loan_count = loanCount;
+        book.loan = loan;
+
+        return book;
+      });
+  }
+
+  function injectCategories(book) {
+    let catQuery =
+      "SELECT c.name FROM categories c JOIN books_categories bc ON c.id = bc.category_id JOIN books b ON b.id = bc.book_id WHERE b.id = ?";
+    catQuery = mysql.format(catQuery, [book.id]);
+    return pool
+      .query(catQuery)
+      .then(([rows, fields]) => {
+        book.categories = rows.map((row) => row.name);
+      })
+      .then(() => {
+        return book;
+      });
   }
 
   return {
@@ -91,24 +107,30 @@ var books = (function () {
           retrievedBooks[i],
           currentUserId
         );
+        retrievedBooks[i] = await injectCategories(retrievedBooks[i]);
       }
 
       return Promise.resolve(retrievedBooks);
     },
-    get: async function (bookId, injectLoanData = true, currentUserId) {
+    get: async function (bookId, needLoanData = true, currentUserId) {
       var sql = "SELECT * FROM books WHERE id = ?";
       var inserts = [bookId];
       sql = mysql.format(sql, inserts);
 
-      return pool.query(sql).then(([rows, fields]) => {
-        if (!rows || rows.length === 0) {
-          return null;
-        } else if (injectLoanData) {
-          return injectLoanInfo(rows[0], currentUserId);
-        } else {
-          return rows[0];
-        }
-      });
+      return pool
+        .query(sql)
+        .then(([rows, fields]) => {
+          if (!rows || rows.length === 0) {
+            return null;
+          }
+          return injectCategories(rows[0]);
+        })
+        .then((book) => {
+          if (book && needLoanData) {
+            return injectLoanInfo(book, currentUserId);
+          }
+          return book;
+        });
     },
     insert: function (book) {
       var sql =
@@ -123,7 +145,14 @@ var books = (function () {
       ];
       sql = mysql.format(sql, inserts);
 
-      return pool.query(sql);
+      return pool.query(sql).then(([result, fields]) => {
+        if (result.affectedRows === 0) {
+          return null;
+        }
+        return categories.updateForBook(book).then(() => {
+          return result.insertId;
+        });
+      });
     },
     update: function (book) {
       var sql =
@@ -139,7 +168,9 @@ var books = (function () {
       ];
       sql = mysql.format(sql, inserts);
 
-      return pool.query(sql);
+      return pool.query(sql).then(([result, fields]) => {
+        return categories.updateForBook(book);
+      });
     },
     delete: function (bookId) {
       var sql = "DELETE from books WHERE id = ?";
@@ -152,12 +183,49 @@ var books = (function () {
 })();
 
 var categories = (function () {
-  return {
-    get: function (categoryId) {
-      var sql = "SELECT * FROM categories WHERE id = ?";
-      var inserts = [categoryId];
-      sql = mysql.format(sql, inserts);
+  function updateCategories(book, catName) {
+    return pool
+      .query(
+        mysql.format(
+          "INSERT IGNORE INTO categories (user_id, name) VALUES (?,?)",
+          [book.user_id, catName]
+        )
+      )
+      .then(([result, fields]) => {
+        if (result.affectedRows !== 0) {
+          return result.insertId;
+        }
+        return categories.getByUserAndName(book.userId, catName);
+      })
+      .then((categoryId) => {
+        return pool.query(
+          mysql
+            .format(
+              "INSERT IGNORE INTO books_categories (book_id, category_id) VALUES (?,?)",
+              [book.id, categoryId]
+            )
+            .then(([result, fields]) => result)
+        );
+      });
+  }
 
+  return {
+    updateForBook: function (book) {
+      if (!book.categories || book.categories.length === 0) {
+        return Promise.resolve();
+      }
+
+      let actions = book.categories.map((category) =>
+        updateCategories(book, category)
+      );
+      return Promise.all(actions);
+    },
+
+    getByUserAndName: function (userId, categoryName) {
+      sql = mysql.format(
+        "SELECT * FROM categories WHERE userId = ? AND categoryName = ?",
+        [userId, categoryName]
+      );
       return pool.query(sql).then(([rows, fields]) => {
         if (!rows || rows.length === 0) {
           return null;
@@ -165,6 +233,7 @@ var categories = (function () {
         return rows[0];
       });
     },
+     /*
     getAllByUserId: function (category) {
       var sql = "SELECT * FROM categories WHERE id = ?";
       var inserts = [category.user_id];
@@ -197,7 +266,7 @@ var categories = (function () {
       sql = mysql.format(sql, inserts);
 
       return pool.query(sql);
-    },
+    },*/,
   };
 })();
 

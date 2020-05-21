@@ -7,7 +7,6 @@ const MySQLStore = require("express-mysql-session")(session);
 const cors = require("cors");
 
 const libraryRoutes = require("./routes/libraries");
-const categoryRoutes = require("./routes/categories");
 const friendRoutes = require("./routes/friends");
 const loanRoutes = require("./routes/loans");
 const userRoutes = require("./routes/users");
@@ -85,7 +84,6 @@ router
     next();
   })
   .use("/libraries", routeProtection, libraryRoutes)
-  .use("/categories", routeProtection, categoryRoutes)
   .use("/friends", routeProtection, friendRoutes)
   .use("/loans", routeProtection, loanRoutes)
   .use("/users", routeProtection, userRoutes)

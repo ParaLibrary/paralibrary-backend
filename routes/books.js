@@ -10,15 +10,15 @@ router.route("/").post(function (req, res) {
   }
   db.books
     .insert(book)
-    .then(([result, fields]) => {
-      if (result.affectedRows === 0) {
+    .then((bookId) => {
+      if (bookId == null) {
         // If no rows are affected, send a 404.
         res.statusCode = 404;
         res.end();
         return;
       }
       res.statusCode = 200;
-      res.json({ id: result.insertId });
+      res.json({ id: bookId });
     })
     .catch((error) => {
       res.status(404).end();
@@ -42,12 +42,7 @@ router
     let book = req.body;
     db.books
       .update(book)
-      .then(([result, fields]) => {
-        if (result.affectedRows === 0) {
-          res.statusCode = 404;
-          res.end();
-          return;
-        }
+      .then((result) => {
         res.status(200).end();
       })
       .catch((error) => {
