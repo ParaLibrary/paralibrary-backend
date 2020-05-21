@@ -16,8 +16,9 @@ router.route("/").get(function (req, res) {
 router
   .route("/:id")
   .get(function (req, res) {
+    let user = 3;
     db.friends
-      .getAll(req.session.userId)
+      .getFriendsofFriend(/*req.session.userId*/ user)
       .then((friends) => {
         res.status(200).json(friends).end();
       })
