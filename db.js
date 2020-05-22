@@ -151,6 +151,7 @@ var books = (function () {
         if (result.affectedRows === 0) {
           return null;
         }
+        book.id = result.insertId;
         return categories.syncBook(book).then(() => {
           return result.insertId;
         });
