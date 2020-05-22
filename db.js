@@ -191,8 +191,10 @@ var categories = (function () {
         return Promise.resolve();
       }
 
-      let newCats = book.categories;
-      let oldCats = await books.get(book.id).then((book) => book.categories);
+      let newCats = book.categories.map((c) => c.toLowerCase());
+      let oldCats = await books
+        .get(book.id)
+        .then((book) => book.categories.map((c) => c.toLowerCase()));
       let deleteCats = oldCats.filter((cat) => !newCats.includes(cat));
 
       // Delete old cats asynchronously
@@ -234,18 +236,6 @@ var categories = (function () {
               .then(([result, fields]) => result);
           })
       );
-    },
-    getByUserAndName: function (userId, categoryName) {
-      sql = mysql.format(
-        "SELECT * FROM categories WHERE user_id = ? AND name = ?",
-        [userId, categoryName]
-      );
-      return pool.query(sql).then(([rows, fields]) => {
-        if (!rows || rows.length === 0) {
-          return null;
-        }
-        return rows[0];
-      });
     },
     removeUnusedCats: async function (book) {
       let newCats = book.categories;
