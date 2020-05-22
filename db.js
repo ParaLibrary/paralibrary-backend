@@ -205,20 +205,22 @@ var categories = (function () {
     },
     insertCategories: function (book, categories) {
       // Insert into the categories table
-      let temp = mysql.format(
-        "INSERT IGNORE INTO categories (user_id, name) VALUES ?",
-        [categories.map((cat) => [book.user_id, cat])]
-      );
       return (
         pool
-          .query(temp)
+          .query(
+            mysql.format(
+              "INSERT IGNORE INTO categories (user_id, name) VALUES ?",
+              [categories.map((cat) => [book.user_id, cat])]
+            )
+          )
           // Get the id of the categories
           .then(() => {
-            temp = mysql.format(
-              "SELECT id FROM categories c WHERE user_id = ? AND name IN (?)",
-              [book.user_id, categories]
+            return pool.query(
+              mysql.format(
+                "SELECT id FROM categories c WHERE user_id = ? AND name IN (?)",
+                [book.user_id, categories]
+              )
             );
-            return pool.query(temp);
           })
           // Link the categories to the book
           .then(([rows, fields]) => {
