@@ -150,7 +150,8 @@ Expects a partial **Book Object** as JSON in the body of the request. See below 
   "author": "An Author Name (optional)",
   "isbn": "1234567890123 (optional)",
   "summary": "Can be very long (optional)",
-  "visibility": "public"
+  "visibility": "public",
+  "categories": ["optional", "array", "of categories"]
 }
 ```
 
