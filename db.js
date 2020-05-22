@@ -149,7 +149,7 @@ var books = (function () {
         if (result.affectedRows === 0) {
           return null;
         }
-        return categories.updateForBook(book).then(() => {
+        return categories.syncBook(book).then(() => {
           return result.insertId;
         });
       });
@@ -169,7 +169,7 @@ var books = (function () {
       sql = mysql.format(sql, inserts);
 
       return pool.query(sql).then(([result, fields]) => {
-        return categories.updateForBook(book);
+        return categories.syncBook(book);
       });
     },
     delete: function (bookId) {
@@ -183,47 +183,49 @@ var books = (function () {
 })();
 
 var categories = (function () {
-  function updateCategories(book, catName) {
-    return pool
-      .query(
-        mysql.format(
-          "INSERT IGNORE INTO categories (user_id, name) VALUES (?,?)",
-          [book.user_id, catName]
-        )
-      )
-      .then(([result, fields]) => {
-        if (result.affectedRows !== 0) {
-          return result.insertId;
-        }
-        return categories.getByUserAndName(book.userId, catName);
-      })
-      .then((categoryId) => {
-        return pool.query(
-          mysql
-            .format(
-              "INSERT IGNORE INTO books_categories (book_id, category_id) VALUES (?,?)",
-              [book.id, categoryId]
-            )
-            .then(([result, fields]) => result)
-        );
-      });
-  }
-
   return {
-    updateForBook: function (book) {
+    syncBook: async function (book) {
       if (!book.categories || book.categories.length === 0) {
         return Promise.resolve();
       }
 
-      let actions = book.categories.map((category) =>
-        updateCategories(book, category)
+      // Delete old cats asynchronously
+      removeUnusedCats(book);
+
+      // Add new cats
+      let actions = newCats.map((category) =>
+        categories.addCategory(book, category)
       );
       return Promise.all(actions);
     },
-
+    addCategory: function (book, catName) {
+      return pool
+        .query(
+          mysql.format(
+            "INSERT IGNORE INTO categories (user_id, name) VALUES (?,?)",
+            [book.user_id, catName]
+          )
+        )
+        .then(([result, fields]) => {
+          if (result.affectedRows !== 0) {
+            return result.insertId;
+          }
+          return categories.getByUserAndName(book.user_id, catName);
+        })
+        .then((category) => {
+          return pool
+            .query(
+              mysql.format(
+                "INSERT IGNORE INTO books_categories (book_id, category_id) VALUES (?,?)",
+                [book.id, category.id]
+              )
+            )
+            .then(([result, fields]) => result);
+        });
+    },
     getByUserAndName: function (userId, categoryName) {
       sql = mysql.format(
-        "SELECT * FROM categories WHERE userId = ? AND categoryName = ?",
+        "SELECT * FROM categories WHERE user_id = ? AND name = ?",
         [userId, categoryName]
       );
       return pool.query(sql).then(([rows, fields]) => {
@@ -233,40 +235,28 @@ var categories = (function () {
         return rows[0];
       });
     },
-     /*
-    getAllByUserId: function (category) {
-      var sql = "SELECT * FROM categories WHERE id = ?";
-      var inserts = [category.user_id];
-      sql = mysql.format(sql, inserts);
-
-      return pool.query(sql).then(([rows, fields]) => {
-        if (!rows || rows.length === 0) {
-          return null;
-        }
-        return rows[0];
-      });
+    removeUnusedCats: function (book) {
+      let newCats = book.categories;
+      let oldCats = await books.get(book.id).then((book) => book.categories);
+      let deleteCats = oldCats.filter((cat) => !newCats.includes(cat));
+      if (deleteCats.length > 0) {
+        return pool
+          .query(
+            mysql.format(
+              "DELETE bc FROM books_categories bc JOIN categories c ON c.id = bc.category_id WHERE book_id = ? AND user_id = ? AND c.name IN (?)",
+              [book.id, book.user_id, deleteCats]
+            )
+          )
+          // Delete unused categories
+          .then(() => {
+            pool.query(
+              "DELETE FROM categories WHERE id NOT IN (SELECT category_id FROM books_categories)"
+            );
+          })
+          .catch((error) => console.error(error));
+      }
+      return Promise.resolve();
     },
-    insert: function (category) {
-      var sql = "INSERT INTO categories (user_id, name) VALUES (?,?)";
-      var inserts = [[category.user_id, category.name]];
-      sql = mysql.format(sql, inserts);
-
-      return pool.query(sql);
-    },
-    update: function (category) {
-      var sql = "UPDATE categories SET name = ? WHERE id = ?";
-      var inserts = [category.name, category.id];
-      sql = mysql.format(sql, inserts);
-
-      return pool.query(sql);
-    },
-    delete: function (categoryId) {
-      var sql = "DELETE FROM categories WHERE id = ?";
-      var inserts = [categoryId];
-      sql = mysql.format(sql, inserts);
-
-      return pool.query(sql);
-    },*/,
   };
 })();
 

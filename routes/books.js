@@ -47,6 +47,7 @@ router
       })
       .catch((error) => {
         res.status(404).end();
+        console.error(error);
       });
   })
   .delete(function (req, res) {
