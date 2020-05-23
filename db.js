@@ -367,13 +367,10 @@ var loans = (function () {
 
     updateLoanById: async function (loan) {
       var updateQuery =
-        "UPDATE loans SET requester_id = ?, book_id = ?, owner_contact = ?, " +
-        "requester_contact = ?, request_date = ?, accept_date = ?, loan_start_date = ?, " +
-        "loan_end_date = ?, return_date = ?, status = ? " +
+        "UPDATE loans SET owner_contact = ?, requester_contact = ?, request_date = ?, accept_date = ?, 
+        "loan_start_date = ?, loan_end_date = ?, return_date = ?, status = ? " +
         "WHERE id = ?";
       var inserts = [
-        loan.requester_id,
-        loan.book_id,
         loan.owner_contact,
         loan.requester_contact,
         loan.request_date,
