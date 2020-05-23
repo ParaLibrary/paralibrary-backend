@@ -343,31 +343,41 @@ var loans = (function () {
       return loanData;
     },
 
-    insert: function (loan) {
+    insert: async function (loan) {
       var sql =
-        "INSERT INTO loans (requester_id, book_id, owner_contact, requester_contact, " +
-        "request_date, accept_date, loan_start_date, loan_end_date, return_date, status) " +
-        "VALUES (?,?,?,?,?,?,?,?,?,?)";
-      var inserts = [
+        "INSERT INTO loans (requester_id, book_id, requester_contact, owner_contact, status) " +
+        "VALUES (?,?,?,?,?)";
+      var initialInserts = [
         loan.requester_id,
         loan.book_id,
-        loan.owner_contact,
         loan.requester_contact,
-        loan.request_date,
-        loan.accept_date,
-        loan.loan_start_date,
-        loan.loan_end_date,
-        loan.return_date,
+        " ",
         "pending",
       ];
-      sql = mysql.format(sql, inserts);
+      sql = mysql.format(sql, initialInserts);
 
-      return pool.query(sql);
+      var getStatusQuery = `SELECT COUNT (*) as "count" FROM loans WHERE requester_id = ? AND book_id = ?`;
+      var secondaryInserts = [loan.requester_id, loan.book_id];
+      getStatusQuery = mysql.format(getStatusQuery, secondaryInserts);
+
+      let currentLoan = await pool
+        .query(getStatusQuery)
+        .then(([rows, fields]) => {
+          return rows;
+        });
+
+      console.log(currentLoan[0].count);
+
+      if (currentLoan[0].count >= 1) {
+        return null;
+      } else {
+        return pool.query(sql);
+      }
     },
 
     updateLoanById: async function (loan) {
       var updateQuery =
-        "UPDATE loans SET owner_contact = ?, requester_contact = ?, request_date = ?, accept_date = ?, 
+        "UPDATE loans SET owner_contact = ?, requester_contact = ?, request_date = ?, accept_date = ?, " +
         "loan_start_date = ?, loan_end_date = ?, return_date = ?, status = ? " +
         "WHERE id = ?";
       var inserts = [
