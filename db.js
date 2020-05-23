@@ -393,24 +393,7 @@ var loans = (function () {
       ];
       updateQuery = mysql.format(updateQuery, inserts);
 
-      //var currentLoan = await loans.getLoanStatus(loan.id);
-      //var getStatusQuery = "SELECT status FROM loans WHERE id = ?";
-      var getStatusQuery = `SELECT COUNT (*) as "count" FROM loans WHERE id = ?`;
-      getStatusQuery = mysql.format(getStatusQuery, loan.id);
-
-      let currentLoan = await pool
-        .query(getStatusQuery)
-        .then(([rows, fields]) => {
-          return rows;
-        });
-
-      console.log(currentLoan[0].count);
-
-      if (currentLoan[0].count === 1) {
-        return null;
-      } else {
-        return pool.query(sql);
-      }
+      return pool.query(updateQuery);
     },
 
     deleteLoan: function (loanId) {
