@@ -308,6 +308,28 @@ var loans = (function () {
       return loanData;
     },
 
+    insert: function (loan) {
+      var sql =
+        "INSERT INTO loans (requester_id, book_id, owner_contact, requester_contact, " +
+        "request_date, accept_date, loan_start_date, loan_end_date, return_date, status) " +
+        "VALUES (?,?,?,?,?,?,?,?,?,?)";
+      var inserts = [
+        loan.requester_id,
+        loan.book_id,
+        loan.owner_contact,
+        loan.requester_contact,
+        loan.request_date,
+        loan.accept_date,
+        loan.loan_start_date,
+        loan.loan_end_date,
+        loan.return_date,
+        "pending",
+      ];
+      sql = mysql.format(sql, inserts);
+
+      return pool.query(sql);
+    },
+
     updateLoanById: function (loan) {
       var sql =
         "UPDATE loans SET requester_id = ?, book_id = ?, owner_contact = ?, " +
