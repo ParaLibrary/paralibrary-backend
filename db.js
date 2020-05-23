@@ -231,6 +231,31 @@ var friends = (function () {
     },
 
     getFriendsofFriend: async function (friendId) {
+      var allFriendsQuery =
+        "SELECT DISTINCT u.id, u.name " +
+        "FROM friendships a " +
+        "INNER JOIN friendships b " +
+        "ON a.friend_id = b.user_id " +
+        "INNER JOIN users u " +
+        "ON u.id = b.friend_id " +
+        "WHERE a.user_id = ? AND " +
+        "b.friend_id <> a.user_id ";
+
+      allFriendsQuery = mysql.format(allFriendsQuery, friendId);
+
+      var allFriends = await pool
+        .query(allFriendsQuery)
+        .then(([rows, fields]) => {
+          return rows;
+        });
+
+      var closeFriends = await friends.getAll(friendId);
+
+      var friendsOfFriends = allFriends.map((x) => !closeFriends.includes(x));
+
+      return { friendsOfFriends };
+
+      /*
       var friendData = await friends.getAll(friendId);
 
       var friendSize = friendData.length;
@@ -258,8 +283,8 @@ var friends = (function () {
 
         //friendData[i].friend_of_friend = friendOfFriend;
       }
-
       return friendData;
+      */
     },
 
     update: async function (userId, friendId, userStatus, friendStatus) {
