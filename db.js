@@ -310,19 +310,13 @@ var loans = (function () {
 
     insert: function (loan) {
       var sql =
-        "INSERT INTO loans (requester_id, book_id, owner_contact, requester_contact, " +
-        "request_date, accept_date, loan_start_date, loan_end_date, return_date, status) " +
-        "VALUES (?,?,?,?,?,?,?,?,?,?)";
+        "INSERT INTO loans (requester_id, book_id, requester_contact, owner_contact, status) " +
+        "VALUES (?,?,?,?,?)";
       var inserts = [
         loan.requester_id,
         loan.book_id,
-        loan.owner_contact,
         loan.requester_contact,
-        loan.request_date,
-        loan.accept_date,
-        loan.loan_start_date,
-        loan.loan_end_date,
-        loan.return_date,
+        " ",
         "pending",
       ];
       sql = mysql.format(sql, inserts);
