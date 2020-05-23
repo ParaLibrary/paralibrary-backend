@@ -343,15 +343,30 @@ var loans = (function () {
       return loanData;
     },
 
-    getLoanStatus: async function (loanId) {
-      var sql = "GET status FROM loans WHERE id = ?";
-      sql = mysql.format(sql, loanId);
+    insert: function (loan) {
+      var sql =
+        "INSERT INTO loans (requester_id, book_id, owner_contact, requester_contact, " +
+        "request_date, accept_date, loan_start_date, loan_end_date, return_date, status) " +
+        "VALUES (?,?,?,?,?,?,?,?,?,?)";
+      var inserts = [
+        loan.requester_id,
+        loan.book_id,
+        loan.owner_contact,
+        loan.requester_contact,
+        loan.request_date,
+        loan.accept_date,
+        loan.loan_start_date,
+        loan.loan_end_date,
+        loan.return_date,
+        "pending",
+      ];
+      sql = mysql.format(sql, inserts);
 
       return pool.query(sql);
     },
 
     updateLoanById: async function (loan) {
-      var sql =
+      var updateQuery =
         "UPDATE loans SET requester_id = ?, book_id = ?, owner_contact = ?, " +
         "requester_contact = ?, request_date = ?, accept_date = ?, loan_start_date = ?, " +
         "loan_end_date = ?, return_date = ?, status = ? " +
@@ -369,11 +384,22 @@ var loans = (function () {
         loan.status,
         loan.id,
       ];
-      sql = mysql.format(sql, inserts);
+      updateQuery = mysql.format(updateQuery, inserts);
 
-      var currentLoan = await loans.getLoanStatus(loan.id);
+      //var currentLoan = await loans.getLoanStatus(loan.id);
+      //var getStatusQuery = "SELECT status FROM loans WHERE id = ?";
+      var getStatusQuery = `SELECT COUNT (*) as "count" FROM loans WHERE id = ?`;
+      getStatusQuery = mysql.format(getStatusQuery, loan.id);
 
-      if (currentLoan.status === "requested") {
+      let currentLoan = await pool
+        .query(getStatusQuery)
+        .then(([rows, fields]) => {
+          return rows;
+        });
+
+      console.log(currentLoan[0].count);
+
+      if (currentLoan[0].count === 1) {
         return null;
       } else {
         return pool.query(sql);
