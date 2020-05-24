@@ -279,6 +279,7 @@ var friends = (function () {
         return rows;
       });
     },
+
     get: function (friendId) {
       var sql =
         "SELECT friend_id, status, name " +
@@ -292,6 +293,39 @@ var friends = (function () {
         return rows;
       });
     },
+
+    getFriendsofFriend: async function (friendId) {
+      var friendData = await friends.getAll(friendId);
+
+      var friendSize = friendData.length;
+
+      for (var i = 0; i < friendSize; i++) {
+        var targetFriend = friendData[i].id;
+        //var friendOfFriend = await friends.getAll(targetFriend);
+
+        var friendQuery =
+          "SELECT u.id, u.name, f.status " +
+          "FROM users u " +
+          "JOIN friendships f ON (u.id = f.friend_id) " +
+          "AND (f.user_id = ?) AND (users.id != ?)";
+
+        var inserts = [targetFriend, friendId];
+        friendQuery = mysql.format(friendQuery, inserts);
+
+        var friendOfFriend = await pool
+          .query(friendQuery)
+          .then(([rows, fields]) => {
+            return rows;
+          });
+
+        friendData[i].friend_of_friend = friendOfFriend;
+
+        //friendData[i].friend_of_friend = friendOfFriend;
+      }
+
+      return friendData;
+    },
+
     update: async function (userId, friendId, userStatus, friendStatus) {
       const insertUpdate =
         "INSERT INTO friendships VALUES (?,?,?) ON DUPLICATE KEY UPDATE status = VALUES(status)";
@@ -300,6 +334,7 @@ var friends = (function () {
         mysql.format(insertUpdate, [friendId, userId, friendStatus]),
       ]);
     },
+
     delete: function (userId, friendId) {
       // Will delete the requestee's row
       const deleteStatement =
@@ -372,44 +407,50 @@ var loans = (function () {
       return loanData;
     },
 
-    insert: function (loan) {
+    insert: async function (loan) {
+      var getStatusQuery = `SELECT COUNT (*) as "count" FROM loans WHERE requester_id = ? AND book_id = ?`;
+      var statusInserts = [loan.requester_id, loan.book_id];
+      getStatusQuery = mysql.format(getStatusQuery, statusInserts);
+
+      let loanCheck = await pool
+        .query(getStatusQuery)
+        .then(([rows, fields]) => {
+          return rows;
+        });
+
+      if (loanCheck[0].count >= 1) {
+        // The count will always return a row, so if count === 0,
+        // then no row exists with the same requester_id and book_id.
+        return Promise.reject();
+      } else {
+        var insertQuery =
+          "INSERT INTO loans book_id, requester_contact, owner_contact, status) " +
+          "VALUES (?,?,?,?)";
+        var insertParams = [
+          loan.book_id,
+          loan.requester_contact,
+          " ",
+          "pending",
+        ];
+        insertQuery = mysql.format(insertQuery, insertParams);
+        return pool.query(insertQuery);
+      }
+    },
+             
+    updateLoanById: function (loan) {
       var sql =
-        "INSERT INTO loans (requester_id, book_id, requester_contact, owner_contact, status) " +
-        "VALUES (?,?,?,?,?)";
+        "UPDATE loans SET book_id = ?, requester_contact = ?, owner_contact = ?, status = ?
+        "WHERE id = ?";
       var inserts = [
-        loan.requester_id,
         loan.book_id,
         loan.requester_contact,
         " ",
-        "pending",
-      ];
-      sql = mysql.format(sql, inserts);
-
-      return pool.query(sql);
-    },
-
-    updateLoanById: function (loan) {
-      var sql =
-        "UPDATE loans SET requester_id = ?, book_id = ?, owner_contact = ?, " +
-        "requester_contact = ?, request_date = ?, accept_date = ?, loan_start_date = ?, " +
-        "loan_end_date = ?, return_date = ?, status = ? " +
-        "WHERE id = ?";
-      var inserts = [
-        loan.requester_id,
-        loan.book_id,
-        loan.owner_contact,
-        loan.requester_contact,
-        loan.request_date,
-        loan.accept_date,
-        loan.loan_start_date,
-        loan.loan_end_date,
-        loan.return_date,
         loan.status,
         loan.id,
       ];
-      sql = mysql.format(sql, inserts);
+      updateQuery = mysql.format(updateQuery, inserts);
 
-      return pool.query(sql);
+      return pool.query(updateQuery);
     },
 
     deleteLoan: function (loanId) {
