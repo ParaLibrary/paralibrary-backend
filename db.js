@@ -436,10 +436,10 @@ var loans = (function () {
         return pool.query(insertQuery);
       }
     },
-             
+
     updateLoanById: function (loan) {
       var sql =
-        "UPDATE loans SET book_id = ?, requester_contact = ?, owner_contact = ?, status = ?
+        "UPDATE loans SET book_id = ?, requester_contact = ?, owner_contact = ?, status = ? " +
         "WHERE id = ?";
       var inserts = [
         loan.book_id,
