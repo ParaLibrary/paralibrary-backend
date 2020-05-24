@@ -344,34 +344,33 @@ var loans = (function () {
     },
 
     insert: async function (loan) {
-      var sql =
-        "INSERT INTO loans (requester_id, book_id, requester_contact, owner_contact, status) " +
-        "VALUES (?,?,?,?,?)";
-      var initialInserts = [
-        loan.requester_id,
-        loan.book_id,
-        loan.requester_contact,
-        " ",
-        "pending",
-      ];
-      sql = mysql.format(sql, initialInserts);
-
       var getStatusQuery = `SELECT COUNT (*) as "count" FROM loans WHERE requester_id = ? AND book_id = ?`;
-      var secondaryInserts = [loan.requester_id, loan.book_id];
-      getStatusQuery = mysql.format(getStatusQuery, secondaryInserts);
+      var statusInserts = [loan.requester_id, loan.book_id];
+      getStatusQuery = mysql.format(getStatusQuery, statusInserts);
 
-      let currentLoan = await pool
+      let loanCheck = await pool
         .query(getStatusQuery)
         .then(([rows, fields]) => {
           return rows;
         });
 
-      console.log(currentLoan[0].count);
-
-      if (currentLoan[0].count >= 1) {
-        return null;
+      if (loanCheck[0].count >= 1) {
+        // The count will always return a row, so if count === 0,
+        // then no row exists with the same requester_id and book_id.
+        return Promise.reject();
       } else {
-        return pool.query(sql);
+        var insertQuery =
+          "INSERT INTO loans (requester_id, book_id, requester_contact, owner_contact, status) " +
+          "VALUES (?,?,?,?,?)";
+        var insertParams = [
+          loan.requester_id,
+          loan.book_id,
+          loan.requester_contact,
+          " ",
+          "pending",
+        ];
+        insertQuery = mysql.format(insertQuery, insertParams);
+        return pool.query(insertQuery);
       }
     },
 
@@ -459,16 +458,12 @@ var users = (function () {
 
       return pool.query(sql);
     },
-    delete: function (userId, currentUserId) {
+    delete: function (userId) {
       var sql = "DELETE FROM users WHERE id = ?";
       var inserts = [userId];
       sql = mysql.format(sql, inserts);
 
-      if (userId === currentUserId) {
-        return pool.query(sql);
-      } else {
-        return null;
-      }
+      return pool.query(sql);
     },
   };
 })();
