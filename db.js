@@ -424,15 +424,9 @@ var loans = (function () {
         return Promise.reject();
       } else {
         var insertQuery =
-          "INSERT INTO loans (book_id, requester_contact, requester_id, owner_contact, status) " +
+          "INSERT INTO loans (book_id, requester_id, owner_contact, status) " +
           "VALUES (?,?,?,?,?)";
-        var insertParams = [
-          loan.book_id,
-          loan.requester_contact,
-          loan.requester_id,
-          " ",
-          loan.status,
-        ];
+        var insertParams = [loan.book_id, loan.requester_id, " ", loan.status];
         insertQuery = mysql.format(insertQuery, insertParams);
         return pool.query(insertQuery);
       }
@@ -456,8 +450,6 @@ var loans = (function () {
         var deletion = await pool.query(deleteQuery).then(([rows, fields]) => {
           return rows;
         });
-
-        //var updatedLoan = await loans.insert(loan);
 
         return update;
       } else {
