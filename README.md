@@ -407,7 +407,7 @@ On success, returns status `200` and an array of **Loan Objects**. On failure, r
 
 ### Fetch Format
 
-Expects the requester_id, book_id, owner_contact, and status in the body of the request.
+Expects the requester_id, book_id, and status in the body of the request.
 
 ### Response
 
