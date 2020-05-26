@@ -424,9 +424,15 @@ var loans = (function () {
         return Promise.reject();
       } else {
         var insertQuery =
-          "INSERT INTO loans (book_id, requester_id, owner_contact, status) " +
+          "INSERT INTO loans (book_id, requester_id, requester_contact, owner_contact, status) " +
           "VALUES (?,?,?,?,?)";
-        var insertParams = [loan.book_id, loan.requester_id, " ", loan.status];
+        var insertParams = [
+          loan.book_id,
+          loan.requester_id,
+          " ",
+          " ",
+          loan.status,
+        ];
         insertQuery = mysql.format(insertQuery, insertParams);
         return pool.query(insertQuery);
       }
@@ -434,24 +440,26 @@ var loans = (function () {
 
     updateLoanById: async function (loan) {
       if (loan.status === "accepted") {
-        var updateQuery = "UPDATE loans SET status = ? WHERE id = ?";
-        var updateInserts = [loan.status, loan.id];
+        let updateQuery = "UPDATE loans SET status = ? WHERE id = ?";
+        let updateInserts = [loan.status, loan.id];
         updateQuery = mysql.format(updateQuery, updateInserts);
 
-        var update = await pool.query(updateQuery).then(([rows, fields]) => {
+        let updateRow = await pool.query(updateQuery).then(([rows, fields]) => {
           return rows;
         });
 
-        var deleteQuery =
+        let deleteQuery =
           "DELETE FROM loans WHERE status = 'pending' AND book_id = ?";
-        var deleteInserts = [loan.book_id];
+        let deleteInserts = [loan.book_id];
         deleteQuery = mysql.format(deleteQuery, deleteInserts);
 
-        var deletion = await pool.query(deleteQuery).then(([rows, fields]) => {
-          return rows;
-        });
+        let deleteRows = await pool
+          .query(deleteQuery)
+          .then(([rows, fields]) => {
+            return rows;
+          });
 
-        return update;
+        return updateRow;
       } else {
         return Promise.reject(); // Throw error if the status is not 'accepted'
       }
