@@ -23,7 +23,11 @@ router.route("/login").post((req, res) => {
           // Create new user
           if (!user) {
             return db.users
-              .insert({ name: payload.name, google_id: payload.sub })
+              .insert({
+                name: payload.name,
+                google_id: payload.sub,
+                picture: sub.picture ? sub.picture : "",
+              })
               .then(([results, fields]) => {
                 return results.insertId;
               });
