@@ -465,7 +465,7 @@ var loans = (function () {
 
 var users = (function () {
   const userBaseQuery =
-    "SELECT users.id, name, status " +
+    "SELECT users.id, name, status, picture " +
     "FROM users " +
     "LEFT JOIN friendships ON users.id = friendships.friend_id AND friendships.user_id = ? ";
   return {
@@ -503,15 +503,15 @@ var users = (function () {
       });
     },
     insert: function (user) {
-      var sql = "INSERT INTO users (name, google_id) VALUES (?,?)";
-      var inserts = [user.name, user.google_id];
+      var sql = "INSERT INTO users (name, google_id, picture) VALUES (?,?,?)";
+      var inserts = [user.name, user.google_id, user.picture];
       sql = mysql.format(sql, inserts);
 
       return pool.query(sql);
     },
     update: function (user) {
-      var sql = "UPDATE users SET name = ? WHERE id = ?";
-      var inserts = [user.name, user.id];
+      var sql = "UPDATE users SET name = ?, picture = ? WHERE id = ?";
+      var inserts = [user.name, user.picture, user.id];
       sql = mysql.format(sql, inserts);
 
       return pool.query(sql);
