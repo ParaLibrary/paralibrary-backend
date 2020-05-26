@@ -44,8 +44,8 @@ router.route("/login").post((req, res) => {
             db.users.update(user);
           });
           // Store only the userId in the session
-          req.session.userId = userId;
-          return { userId: userId, new: true, maxAge: maxAge };
+          req.session.userId = userId.toString();
+          return { userId: req.session.userId, new: true, maxAge: maxAge };
         });
     })
     .then((json) => {

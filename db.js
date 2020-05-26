@@ -269,7 +269,7 @@ var friends = (function () {
   return {
     getAll: function (currentId) {
       var sql =
-        "SELECT users.id, name, status " +
+        "SELECT users.id, name, status, picture " +
         "FROM users " +
         "JOIN friendships ON users.id = friendships.friend_id AND friendships.user_id = ? ";
       var inserts = [currentId];
@@ -282,7 +282,7 @@ var friends = (function () {
 
     get: function (friendId) {
       var sql =
-        "SELECT friend_id, status, name " +
+        "SELECT friend_id, status, name, picture " +
         "FROM friendships JOIN users " +
         "ON friend_id = id " +
         "WHERE user_id = ?";
@@ -304,7 +304,7 @@ var friends = (function () {
         //var friendOfFriend = await friends.getAll(targetFriend);
 
         var friendQuery =
-          "SELECT u.id, u.name, f.status " +
+          "SELECT u.id, u.name, f.status, u.picture " +
           "FROM users u " +
           "JOIN friendships f ON (u.id = f.friend_id) " +
           "AND (f.user_id = ?) AND (users.id != ?)";
