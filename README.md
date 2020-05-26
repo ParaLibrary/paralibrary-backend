@@ -407,7 +407,7 @@ On success, returns status `200` and an array of **Loan Objects**. On failure, r
 
 ### Fetch Format
 
-Expects a **Loan Object** (without id property) in the body of the request.
+Expects the requester_contact, requester_id, book_id, owner_contact, and status in the body of the request.
 
 ### Response
 
@@ -447,7 +447,7 @@ On success, returns status `200` and a single **Loan Object** matching the :id. 
 
 ### Fetch Format
 
-Expects a full **Loan Object** in the body of the request.
+Expects the id, status, and book_id in the body of the request.
 
 ### Response
 

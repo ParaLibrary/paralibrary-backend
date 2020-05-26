@@ -424,37 +424,49 @@ var loans = (function () {
         return Promise.reject();
       } else {
         var insertQuery =
-          "INSERT INTO loans book_id, requester_contact, owner_contact, status) " +
-          "VALUES (?,?,?,?)";
+          "INSERT INTO loans (book_id, requester_contact, requester_id, owner_contact, status) " +
+          "VALUES (?,?,?,?,?)";
         var insertParams = [
           loan.book_id,
           loan.requester_contact,
+          loan.requester_id,
           " ",
-          "pending",
+          loan.status,
         ];
         insertQuery = mysql.format(insertQuery, insertParams);
         return pool.query(insertQuery);
       }
     },
 
-    updateLoanById: function (loan) {
-      var sql =
-        "UPDATE loans SET book_id = ?, requester_contact = ?, owner_contact = ?, status = ? " +
-        "WHERE id = ?";
-      var inserts = [
-        loan.book_id,
-        loan.requester_contact,
-        " ",
-        loan.status,
-        loan.id,
-      ];
-      updateQuery = mysql.format(updateQuery, inserts);
+    updateLoanById: async function (loan) {
+      if (loan.status === "accepted") {
+        var updateQuery = "UPDATE loans SET status = ? WHERE id = ?";
+        var updateInserts = [loan.status, loan.id];
+        updateQuery = mysql.format(updateQuery, updateInserts);
 
-      return pool.query(updateQuery);
+        var update = await pool.query(updateQuery).then(([rows, fields]) => {
+          return rows;
+        });
+
+        var deleteQuery =
+          "DELETE FROM loans WHERE status = 'pending' AND book_id = ?";
+        var deleteInserts = [loan.book_id];
+        deleteQuery = mysql.format(deleteQuery, deleteInserts);
+
+        var deletion = await pool.query(deleteQuery).then(([rows, fields]) => {
+          return rows;
+        });
+
+        //var updatedLoan = await loans.insert(loan);
+
+        return update;
+      } else {
+        return Promise.reject(); // Throw error if the status is not 'accepted'
+      }
     },
 
     deleteLoan: function (loanId) {
-      var sql = "DELETE from loans WHERE id = ?";
+      var sql = "DELETE FROM loans WHERE id = ?";
       var inserts = [loanId];
       sql = mysql.format(sql, inserts);
 
