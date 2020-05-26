@@ -447,7 +447,7 @@ On success, returns status `200` and a single **Loan Object** matching the :id. 
 
 ### Fetch Format
 
-Expects the id, status, and book_id in the body of the request.
+Expects the id, book_id, and status in the body of the request.
 
 ### Response
 
