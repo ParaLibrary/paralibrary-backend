@@ -208,7 +208,8 @@ Status will be null if the :id user is either the current user or they have no r
 {
   "id": "123",
   "name": "Up to 255 chars",
-  "status": "friends"
+  "status": "friends",
+  "picture": "https://lh3.googleusercontent.com/..."
 }
 ```
 

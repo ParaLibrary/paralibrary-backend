@@ -269,7 +269,7 @@ var friends = (function () {
   return {
     getAll: function (currentId) {
       var sql =
-        "SELECT users.id, name, status " +
+        "SELECT users.id, name, status, picture " +
         "FROM users " +
         "JOIN friendships ON users.id = friendships.friend_id AND friendships.user_id = ? ";
       var inserts = [currentId];
@@ -282,7 +282,7 @@ var friends = (function () {
 
     get: function (friendId) {
       var sql =
-        "SELECT friend_id, status, name " +
+        "SELECT friend_id, status, name, picture " +
         "FROM friendships JOIN users " +
         "ON friend_id = id " +
         "WHERE user_id = ?";
@@ -304,7 +304,7 @@ var friends = (function () {
         //var friendOfFriend = await friends.getAll(targetFriend);
 
         var friendQuery =
-          "SELECT u.id, u.name, f.status " +
+          "SELECT u.id, u.name, f.status, u.picture " +
           "FROM users u " +
           "JOIN friendships f ON (u.id = f.friend_id) " +
           "AND (f.user_id = ?) AND (users.id != ?)";
@@ -465,7 +465,7 @@ var loans = (function () {
 
 var users = (function () {
   const userBaseQuery =
-    "SELECT users.id, name, status " +
+    "SELECT users.id, name, status, picture " +
     "FROM users " +
     "LEFT JOIN friendships ON users.id = friendships.friend_id AND friendships.user_id = ? ";
   return {
@@ -503,15 +503,15 @@ var users = (function () {
       });
     },
     insert: function (user) {
-      var sql = "INSERT INTO users (name, google_id) VALUES (?,?)";
-      var inserts = [user.name, user.google_id];
+      var sql = "INSERT INTO users (name, google_id, picture) VALUES (?,?,?)";
+      var inserts = [user.name, user.google_id, user.picture];
       sql = mysql.format(sql, inserts);
 
       return pool.query(sql);
     },
     update: function (user) {
-      var sql = "UPDATE users SET name = ? WHERE id = ?";
-      var inserts = [user.name, user.id];
+      var sql = "UPDATE users SET name = ?, picture = ? WHERE id = ?";
+      var inserts = [user.name, user.picture, user.id];
       sql = mysql.format(sql, inserts);
 
       return pool.query(sql);
