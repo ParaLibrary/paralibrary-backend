@@ -201,7 +201,7 @@ On success, responds with status `200`. On failure, responds with status `404`.
 
 ### User Object
 
-Status is one of (null | "requested" | "waiting" | "friends")\
+Status is one of (null | #"requested" | "waiting" | "friends")\
 Status will be null if the :id user is either the current user or they have no relation to the current user at all.
 
 ```json
@@ -356,34 +356,34 @@ Status can be one of ("pending" | "accepted" | "loaned" | "returned" | "canceled
 ```json
 [
   {
-    "id": "4",
-    "requester_id": "3",
-    "book_id": "2",
+    "id": "123",
+    "requester_id": "123",
+    "book_id": "123",
     "request_date": "2020-04-16T22:38:49.000Z",
     "accept_date": "2020-04-16T22:38:49.000Z",
     "loan_start_date": "2020-04-16T22:38:49.000Z",
     "loan_end_date": "2020-04-16T22:38:49.000Z",
-    "status": "accepted",
+    "status": "One of five status enums",
     "book": {
-      "id": "2",
-      "user_id": "1",
-      "title": "The Bible 2",
-      "author": "God?",
-      "isbn": "",
-      "visibility": "private",
-      "summary": "The spicy second edition, questionably heretical",
-      "categories": ["Good", "Fantastic"]
+      "id": "123",
+      "user_id": "456",
+      "title": "Up to 255 chars",
+      "author": "Up to 255 chars",
+      "isbn": "101-0-10-101010-1",
+      "visibility": "One of three book visibility enums",
+      "summary": "Up to 255 chars",
+      "categories": ["Example", "AnotherExample"]
     },
     "owner": {
-      "id": "1",
-      "name": "Trent Hashimoto",
-      "status": null,
+      "id": "456",
+      "name": "Up to 255 chars",
+      "status": "One of five status enums (or null)",
       "picture": "https://lh3.googleusercontent.com/a-/AOh14GjqisPCQh-64TyhlUaN39cQK6z0elofGrDipo8W=s96-c",
       "email": "someone@example.com"
     },
     "requester": {
-      "id": "3",
-      "name": "Nathan Gatlin",
+      "id": "123",
+      "name": "Up to 255 chars",
       "status": "requested",
       "picture": "https://lh3.googleusercontent.com/a-/AOh14GjvDknrAwss4wed2u_t8oyI7o19lgnRcI9pkwxVkA=s96-c",
       "email": "someone@example.com"
