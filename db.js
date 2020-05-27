@@ -371,8 +371,8 @@ var loans = (function () {
     getLoansByRequester: function (userId) {
       return loans.baseQuery(`WHERE l.requester_id = '${userId}'`, userId);
     },
-    getLoanById: function (loanId) {
-      return loans.baseQuery(`WHERE l.id = '${loanId}'`, 0);
+    getLoanById: function (loanId, userId) {
+      return loans.baseQuery(`WHERE l.id = '${loanId}'`, userId);
     },
 
     baseQuery: async function (whereClause, userId) {

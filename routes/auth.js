@@ -27,6 +27,7 @@ router.route("/login").post((req, res) => {
                 name: payload.name,
                 google_id: payload.sub,
                 picture: sub.picture ? sub.picture : "",
+                email: "",
               })
               .then(([results, fields]) => {
                 return results.insertId;

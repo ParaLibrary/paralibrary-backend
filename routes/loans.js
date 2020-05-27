@@ -94,7 +94,7 @@ router
   .put(function (req, res) {
     let loan = req.body;
     db.loans
-      .updateLoanById(loan)
+      .updateLoanById(loan, req.session.userId)
       .then(([result, fields]) => {
         if (result.affectedRows === 0) {
           res.statusCode = 404;

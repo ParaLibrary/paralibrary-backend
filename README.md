@@ -201,7 +201,7 @@ On success, responds with status `200`. On failure, responds with status `404`.
 
 ### User Object
 
-Status is one of (null | #"requested" | "waiting" | "friends")\
+Status is one of (null | "requested" | "waiting" | "friends")\
 Status will be null if the :id user is either the current user or they have no relation to the current user at all.
 
 ```json
@@ -375,18 +375,10 @@ Status can be one of ("pending" | "accepted" | "loaned" | "returned" | "canceled
       "categories": ["Example", "AnotherExample"]
     },
     "owner": {
-      "id": "456",
-      "name": "Up to 255 chars",
-      "status": "One of five status enums (or null)",
-      "picture": "https://lh3.googleusercontent.com/a-/AOh14GjqisPCQh-64TyhlUaN39cQK6z0elofGrDipo8W=s96-c",
-      "email": "someone@example.com"
+      "User object": "See User Object"
     },
     "requester": {
-      "id": "123",
-      "name": "Up to 255 chars",
-      "status": "requested",
-      "picture": "https://lh3.googleusercontent.com/a-/AOh14GjvDknrAwss4wed2u_t8oyI7o19lgnRcI9pkwxVkA=s96-c",
-      "email": "someone@example.com"
+      "User object": "See User Object"
     }
   }
 ]
