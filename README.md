@@ -210,6 +210,7 @@ Status will be null if the :id user is either the current user or they have no r
   "name": "Up to 255 chars",
   "status": "friends",
   "picture": "https://lh3.googleusercontent.com/..."
+  "email": "someone
 }
 ```
 
@@ -353,25 +354,42 @@ The timestamps are return as strings\
 Status can be one of ("pending" | "accepted" | "loaned" | "returned" | "canceled" | "declined")
 
 ```json
-{
-  "id": "123",
-  "owner": {
-    "user object": "See User Object"
-  },
-  "owner_contact": "name@domain.com",
-  "requester": {
-    "user object": "See User Object"
-  },
-  "requester_contact": "name@domain.com",
-  "book": {
-    "book object": "See Book Object (but without the loan property)"
-  },
-  "request_date": "2020-04-16T15:38:49.000Z",
-  "accept_date": "2020-04-16T15:38:49.000Z",
-  "loan_start_date": "2020-04-16T15:38:49.000Z",
-  "loan_end_date": "2020-04-16T15:38:49.000Z",
-  "status": "pending"
-}
+[
+  {
+    "id": "4",
+    "requester_id": "3",
+    "book_id": "2",
+    "request_date": "2020-04-16T22:38:49.000Z",
+    "accept_date": "2020-04-16T22:38:49.000Z",
+    "loan_start_date": "2020-04-16T22:38:49.000Z",
+    "loan_end_date": "2020-04-16T22:38:49.000Z",
+    "status": "accepted",
+    "book": {
+      "id": "2",
+      "user_id": "1",
+      "title": "The Bible 2",
+      "author": "God?",
+      "isbn": "",
+      "visibility": "private",
+      "summary": "The spicy second edition, questionably heretical",
+      "categories": ["Good", "Fantastic"]
+    },
+    "owner": {
+      "id": "1",
+      "name": "Trent Hashimoto",
+      "status": null,
+      "picture": "https://lh3.googleusercontent.com/a-/AOh14GjqisPCQh-64TyhlUaN39cQK6z0elofGrDipo8W=s96-c",
+      "email": "someone@example.com"
+    },
+    "requester": {
+      "id": "3",
+      "name": "Nathan Gatlin",
+      "status": "requested",
+      "picture": "https://lh3.googleusercontent.com/a-/AOh14GjvDknrAwss4wed2u_t8oyI7o19lgnRcI9pkwxVkA=s96-c",
+      "email": "someone@example.com"
+    }
+  }
+]
 ```
 
 ### Routes

@@ -269,7 +269,7 @@ var friends = (function () {
   return {
     getAll: function (currentId) {
       var sql =
-        "SELECT users.id, name, status, picture " +
+        "SELECT users.id, name, status, picture, email " +
         "FROM users " +
         "JOIN friendships ON users.id = friendships.friend_id AND friendships.user_id = ? ";
       var inserts = [currentId];
@@ -282,7 +282,7 @@ var friends = (function () {
 
     get: function (friendId) {
       var sql =
-        "SELECT friend_id, status, name, picture " +
+        "SELECT friend_id, status, name, picture, email " +
         "FROM friendships JOIN users " +
         "ON friend_id = id " +
         "WHERE user_id = ?";
@@ -304,7 +304,7 @@ var friends = (function () {
         //var friendOfFriend = await friends.getAll(targetFriend);
 
         var friendQuery =
-          "SELECT u.id, u.name, f.status, u.picture " +
+          "SELECT u.id, u.name, f.status, u.picture, u.email " +
           "FROM users u " +
           "JOIN friendships f ON (u.id = f.friend_id) " +
           "AND (f.user_id = ?) AND (users.id != ?)";
@@ -372,12 +372,12 @@ var loans = (function () {
       return loans.baseQuery(`WHERE l.requester_id = '${userId}'`, userId);
     },
     getLoanById: function (loanId) {
-      return loans.baseQuery(`WHERE l.id = '${(loanId, 0)}'`);
+      return loans.baseQuery(`WHERE l.id = '${loanId}'`, 0);
     },
 
     baseQuery: async function (whereClause, userId) {
       var loanQuery =
-        "SELECT l.id, l.requester_id, l.requester_contact, l.owner_contact, l.book_id, " +
+        "SELECT l.id, l.requester_id, l.book_id, " +
         "l.request_date, l.accept_date, l.loan_start_date, l.loan_end_date, l.status " +
         "FROM loans l " +
         "JOIN books b ON l.book_id = b.id " +
@@ -424,15 +424,9 @@ var loans = (function () {
         return Promise.reject();
       } else {
         var insertQuery =
-          "INSERT INTO loans (book_id, requester_id, requester_contact, owner_contact, status) " +
-          "VALUES (?,?,?,?,?)";
-        var insertParams = [
-          loan.book_id,
-          loan.requester_id,
-          " ",
-          " ",
-          loan.status,
-        ];
+          "INSERT INTO loans (book_id, requester_id, status) " +
+          "VALUES (?,?,?)";
+        var insertParams = [loan.book_id, loan.requester_id, loan.status];
         insertQuery = mysql.format(insertQuery, insertParams);
         return pool.query(insertQuery);
       }
@@ -477,7 +471,7 @@ var loans = (function () {
 
 var users = (function () {
   const userBaseQuery =
-    "SELECT users.id, name, status, picture " +
+    "SELECT users.id, name, status, picture, email " +
     "FROM users " +
     "LEFT JOIN friendships ON users.id = friendships.friend_id AND friendships.user_id = ? ";
   return {
@@ -515,15 +509,17 @@ var users = (function () {
       });
     },
     insert: function (user) {
-      var sql = "INSERT INTO users (name, google_id, picture) VALUES (?,?,?)";
-      var inserts = [user.name, user.google_id, user.picture];
+      var sql =
+        "INSERT INTO users (name, google_id, picture, email) VALUES (?,?,?,?)";
+      var inserts = [user.name, user.google_id, user.picture, user.email];
       sql = mysql.format(sql, inserts);
 
       return pool.query(sql);
     },
     update: function (user) {
-      var sql = "UPDATE users SET name = ?, picture = ? WHERE id = ?";
-      var inserts = [user.name, user.picture, user.id];
+      var sql =
+        "UPDATE users SET name = ?, picture = ?, email = ? WHERE id = ?";
+      var inserts = [user.name, user.picture, user.id, user.email];
       sql = mysql.format(sql, inserts);
 
       return pool.query(sql);
