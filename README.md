@@ -354,34 +354,32 @@ The timestamps are return as strings\
 Status can be one of ("pending" | "accepted" | "loaned" | "returned" | "canceled" | "declined")
 
 ```json
-[
-  {
+{
+  "id": "123",
+  "requester_id": "123",
+  "book_id": "123",
+  "request_date": "2020-04-16T22:38:49.000Z",
+  "accept_date": "2020-04-16T22:38:49.000Z",
+  "loan_start_date": "2020-04-16T22:38:49.000Z",
+  "loan_end_date": "2020-04-16T22:38:49.000Z",
+  "status": "One of five status enums",
+  "book": {
     "id": "123",
-    "requester_id": "123",
-    "book_id": "123",
-    "request_date": "2020-04-16T22:38:49.000Z",
-    "accept_date": "2020-04-16T22:38:49.000Z",
-    "loan_start_date": "2020-04-16T22:38:49.000Z",
-    "loan_end_date": "2020-04-16T22:38:49.000Z",
-    "status": "One of five status enums",
-    "book": {
-      "id": "123",
-      "user_id": "456",
-      "title": "Up to 255 chars",
-      "author": "Up to 255 chars",
-      "isbn": "101-0-10-101010-1",
-      "visibility": "One of three book visibility enums",
-      "summary": "Up to 255 chars",
-      "categories": ["Example", "AnotherExample"]
-    },
-    "owner": {
-      "User object": "See User Object"
-    },
-    "requester": {
-      "User object": "See User Object"
-    }
+    "user_id": "456",
+    "title": "Up to 255 chars",
+    "author": "Up to 255 chars",
+    "isbn": "101-0-10-101010-1",
+    "visibility": "One of three book visibility enums",
+    "summary": "Up to 255 chars",
+    "categories": ["Example", "AnotherExample"]
+  },
+  "owner": {
+    "User object": "See User Object"
+  },
+  "requester": {
+    "User object": "See User Object"
   }
-]
+}
 ```
 
 ### Routes

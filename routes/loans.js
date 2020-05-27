@@ -76,7 +76,7 @@ router
   .route("/:id")
   .get(function (req, res) {
     db.loans
-      .getLoanById(req.params.id)
+      .getLoanById(req.params.id, req.session.userId)
       .then((loan) => {
         if (!loan) {
           res.statusCode = 404;
