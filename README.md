@@ -209,7 +209,8 @@ Status will be null if the :id user is either the current user or they have no r
   "id": "123",
   "name": "Up to 255 chars",
   "status": "friends",
-  "picture": "https://lh3.googleusercontent.com/..."
+  "picture": "https://lh3.googleusercontent.com/...",
+  "email": "someone@example.com"
 }
 ```
 
@@ -355,22 +356,29 @@ Status can be one of ("pending" | "accepted" | "loaned" | "returned" | "canceled
 ```json
 {
   "id": "123",
-  "owner": {
-    "user object": "See User Object"
-  },
-  "owner_contact": "name@domain.com",
-  "requester": {
-    "user object": "See User Object"
-  },
-  "requester_contact": "name@domain.com",
+  "requester_id": "123",
+  "book_id": "123",
+  "request_date": "2020-04-16T22:38:49.000Z",
+  "accept_date": "2020-04-16T22:38:49.000Z",
+  "loan_start_date": "2020-04-16T22:38:49.000Z",
+  "loan_end_date": "2020-04-16T22:38:49.000Z",
+  "status": "One of five status enums",
   "book": {
-    "book object": "See Book Object (but without the loan property)"
+    "id": "123",
+    "user_id": "456",
+    "title": "Up to 255 chars",
+    "author": "Up to 255 chars",
+    "isbn": "101-0-10-101010-1",
+    "visibility": "One of three book visibility enums",
+    "summary": "Up to 255 chars",
+    "categories": ["Example", "AnotherExample"]
   },
-  "request_date": "2020-04-16T15:38:49.000Z",
-  "accept_date": "2020-04-16T15:38:49.000Z",
-  "loan_start_date": "2020-04-16T15:38:49.000Z",
-  "loan_end_date": "2020-04-16T15:38:49.000Z",
-  "status": "pending"
+  "owner": {
+    "User object": "See User Object"
+  },
+  "requester": {
+    "User object": "See User Object"
+  }
 }
 ```
 
