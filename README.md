@@ -208,7 +208,6 @@ Status will be null if the :id user is either the current user or they have no r
 {
   "id": "123",
   "name": "Up to 255 chars",
-  "status": "friends",
   "picture": "https://lh3.googleusercontent.com/...",
   "email": "someone@example.com"
 }
@@ -221,7 +220,7 @@ Status will be null if the :id user is either the current user or they have no r
 |    `GET` | `/users`              | Get the current user's object by id        |
 |    `GET` | `/users/:id`          | Get user object by id                      |
 |    `PUT` | `/users/:id`          | Modify the user object by id               |
-| `DELETE` | `/users/:id`          | Delete the user user by id. O              |
+| `DELETE` | `/users/:id`          | Delete the user user by id.                |
 |    `GET` | `/users/search/:name` | Get list of users matching the name string |
 
 ## `GET /users/:id`
@@ -238,7 +237,7 @@ On Success, returns status `200` and a **User Object**. If the user does not exi
 
 ### Fetch Format
 
-Expects a partial **User Object** in the body of the request. `status` property is ignored.
+Expects a full **User Object** in the body of the request. 
 
 ### Response
 

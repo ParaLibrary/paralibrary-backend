@@ -1,6 +1,7 @@
 var express = require("express");
 var router = express.Router();
 var db = require("../db.js");
+var moment = require("moment");
 router
   .route("/")
   .get(function (req, res) {
@@ -93,8 +94,9 @@ router
 
   .put(function (req, res) {
     let loan = req.body;
+
     db.loans
-      .updateLoanById(loan, req.session.userId)
+      .updateLoanById(loan)
       .then(([result, fields]) => {
         if (result.affectedRows === 0) {
           res.statusCode = 404;
@@ -102,6 +104,7 @@ router
           return;
         }
         res.statusCode = 200;
+        res.end();
       })
       .catch((error) => {
         res.status(404).end();
