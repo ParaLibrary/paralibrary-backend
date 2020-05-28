@@ -94,7 +94,6 @@ router
 
   .put(function (req, res) {
     let loan = req.body;
-
     db.loans
       .updateLoanById(loan)
       .then(([result, fields]) => {

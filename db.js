@@ -1,5 +1,6 @@
 var mysql = require("mysql2");
 var config = require("./config/db");
+var moment = require("moment");
 
 var pool = mysql
   .createPool({
@@ -448,8 +449,9 @@ var loans = (function () {
       let updateInserts = [loan.status, loan.id];
       updateQuery = mysql.format(updateQuery, updateInserts);
 
-      // var now = moment().format("YYYY-MM-DD HH:mm:ss");
-      // will be used later for timestamps
+      //var now = moment().format("YYYY-MM-DD HH:mm:ss");
+      //will be used later for timestamps
+      //console.log(now);
 
       return pool.query(updateQuery).then((updateResult) => {
         if (loan.status === "accepted") {
