@@ -436,7 +436,7 @@ var loans = (function () {
         // Check to see if the requester has an email
 
         var insertQuery =
-          "INSERT INTO loans (book_id, requester_id, status) " +
+          "INSERT INTO loans (book_id, requester_id, status, ) " +
           "VALUES (?,?,?)";
         var insertParams = [loan.book_id, loan.requester_id, loan.status];
         insertQuery = mysql.format(insertQuery, insertParams);
@@ -449,9 +449,11 @@ var loans = (function () {
       let updateInserts = [loan.status, loan.id];
       updateQuery = mysql.format(updateQuery, updateInserts);
 
-      //var now = moment().format("YYYY-MM-DD HH:mm:ss");
-      //will be used later for timestamps
-      //console.log(now);
+      var currentDate = moment().format("YYYY-MM-DD HH:mm:ss");
+      var endDate = moment().add(1, "months");
+      endDate = endDate.format("YYYY-MM-DD HH:mm:ss");
+      console.log(currentDate);
+      console.log(endDate);
 
       return pool.query(updateQuery).then((updateResult) => {
         if (loan.status === "accepted") {
@@ -461,6 +463,20 @@ var loans = (function () {
           deleteQuery = mysql.format(deleteQuery, deleteInserts);
 
           pool.query(deleteQuery);
+
+          let updateTimeQuery =
+            "UPDATE loans SET accept_date = ?, loan_start_date = ?, " +
+            "loan_end_date = ?, return_date = ? WHERE id = ?";
+          let updateTimeInserts = [
+            currentDate,
+            currentDate,
+            endDate,
+            endDate,
+            loan.id,
+          ];
+          updateTimeQuery = mysql.format(updateTimeQuery, updateTimeInserts);
+
+          pool.query(updateTimeQuery);
         }
         return updateResult;
       });
