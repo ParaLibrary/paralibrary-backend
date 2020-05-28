@@ -1,5 +1,6 @@
 var mysql = require("mysql2");
 var config = require("./config/db");
+var moment = require("moment");
 
 var pool = mysql
   .createPool({
@@ -432,6 +433,8 @@ var loans = (function () {
         // then no row exists with the same requester_id and book_id.
         return Promise.reject();
       } else {
+        // Check to see if the requester has an email
+
         var insertQuery =
           "INSERT INTO loans (book_id, requester_id, status) " +
           "VALUES (?,?,?)";
@@ -442,30 +445,25 @@ var loans = (function () {
     },
 
     updateLoanById: async function (loan) {
-      if (loan.status === "accepted") {
-        let updateQuery = "UPDATE loans SET status = ? WHERE id = ?";
-        let updateInserts = [loan.status, loan.id];
-        updateQuery = mysql.format(updateQuery, updateInserts);
+      let updateQuery = "UPDATE loans SET status = ? WHERE id = ?";
+      let updateInserts = [loan.status, loan.id];
+      updateQuery = mysql.format(updateQuery, updateInserts);
 
-        let updateRow = await pool.query(updateQuery).then(([rows, fields]) => {
-          return rows;
-        });
+      //var now = moment().format("YYYY-MM-DD HH:mm:ss");
+      //will be used later for timestamps
+      //console.log(now);
 
-        let deleteQuery =
-          "DELETE FROM loans WHERE status = 'pending' AND book_id = ?";
-        let deleteInserts = [loan.book_id];
-        deleteQuery = mysql.format(deleteQuery, deleteInserts);
+      return pool.query(updateQuery).then((updateResult) => {
+        if (loan.status === "accepted") {
+          let deleteQuery =
+            "DELETE FROM loans WHERE status = 'pending' AND book_id = ?";
+          let deleteInserts = [loan.book_id];
+          deleteQuery = mysql.format(deleteQuery, deleteInserts);
 
-        let deleteRows = await pool
-          .query(deleteQuery)
-          .then(([rows, fields]) => {
-            return rows;
-          });
-
-        return updateRow;
-      } else {
-        return Promise.reject(); // Throw error if the status is not 'accepted'
-      }
+          pool.query(deleteQuery);
+        }
+        return updateResult;
+      });
     },
 
     deleteLoan: function (loanId) {
@@ -528,7 +526,7 @@ var users = (function () {
     update: function (user) {
       var sql =
         "UPDATE users SET name = ?, picture = ?, email = ? WHERE id = ?";
-      var inserts = [user.name, user.picture, user.id, user.email];
+      var inserts = [user.name, user.picture, user.email, user.id];
       sql = mysql.format(sql, inserts);
 
       return pool.query(sql);
