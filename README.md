@@ -208,6 +208,7 @@ Status will be null if the :id user is either the current user or they have no r
 {
   "id": "123",
   "name": "Up to 255 chars",
+  "status": "friends",
   "picture": "https://lh3.googleusercontent.com/...",
   "email": "someone@example.com"
 }
@@ -237,7 +238,7 @@ On Success, returns status `200` and a **User Object**. If the user does not exi
 
 ### Fetch Format
 
-Expects a full **User Object** in the body of the request. 
+Expects a partial **User Object** in the body of the request. The `status` property is ignored.
 
 ### Response
 
