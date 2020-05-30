@@ -445,60 +445,31 @@ var loans = (function () {
     },
 
     updateLoanById: async function (loan) {
-      let updateQuery = "UPDATE loans SET status = ? WHERE id = ?";
-      let updateInserts = [loan.status, loan.id];
-      updateQuery = mysql.format(updateQuery, updateInserts);
+      let currentDate = moment().format("YYYY-MM-DD HH:mm:ss");
+      let updateQuery = `UPDATE loans SET status = '${loan.status}', `;
 
-      var currentDate = moment().format("YYYY-MM-DD HH:mm:ss");
-
-      var updateTimeQuery = "UPDATE loans SET ";
-      // After createing an update query, fetching the current time, and creating a starting updateTime query,
-      // check to see if the status is anything but "accepted." If so, set the time query to update its respective field.
-
-      if (loan.status === "loaned") {
-        updateTimeQuery = updateTimeQuery + "loan_start_date = ? WHERE id = ?";
-        let updateTimeInserts = [currentDate, loan.id];
-        updateTimeQuery = mysql.format(updateTimeQuery, updateTimeInserts);
-
-        pool.query(updateTimeQuery);
-      } else if (loan.status === "returned") {
-        updateTimeQuery = updateTimeQuery + "return_date = ? WHERE id = ?";
-        let updateTimeInserts = [currentDate, loan.id];
-        updateTimeQuery = mysql.format(updateTimeQuery, updateTimeInserts);
-
-        pool.query(updateTimeQuery);
-      } else if (loan.status === "canceled" || loan.status === "declined") {
-        var queuedForDeletion = true; // Sets a delete flag
-        var deleteQuery = "DELETE FROM loans WHERE id = ?";
-        var inserts = [loan.id];
-        deleteQuery = mysql.format(deleteQuery, inserts);
+      switch (loan.status) {
+        case "loaned":
+          updateQuery += `loan_start_date = '${currentDate}' WHERE id = ${loan.id}`;
+          break;
+        case "returned":
+          updateQuery += `return_date = '${currentDate}' WHERE id = ${loan.id}`;
+          break;
+        case "accepted":
+          updateQuery += `accept_date = '${currentDate}' WHERE id = ${loan.id}`;
+          break;
+        default:
+          console.log("Invalid status");
+          return Promise.reject();
       }
 
-      if (queuedForDeletion === true) {
-        // If the goal is to delete the loan, we don't want to update it.
-        // As a result, this only updates the loan if the delete flag has been reached.
-        return pool.query(deleteQuery);
-      } else {
-        // If we have not reached the delete flag, then query the initial updateQuery from the top,
-        // and check to see if the status === "accepted."
-        return pool.query(updateQuery).then((updateResult) => {
-          if (loan.status === "accepted") {
-            let accDeleteQuery =
-              "DELETE FROM loans WHERE status = 'pending' AND book_id = ?";
-            let deleteInserts = [loan.book_id];
-            accDeleteQuery = mysql.format(accDeleteQuery, deleteInserts);
-
-            pool.query(accDeleteQuery);
-
-            updateTimeQuery = updateTimeQuery + "accept_date = ? WHERE id = ?";
-            let updateTimeInserts = [currentDate, loan.id];
-            updateTimeQuery = mysql.format(updateTimeQuery, updateTimeInserts);
-
-            pool.query(updateTimeQuery);
-          }
-          return updateResult;
-        });
-      }
+      return pool.query(updateQuery).then((updateResult) => {
+        if (loan.status === "accepted") {
+          let deleteQuery = `DELETE FROM loans WHERE status = 'pending' AND book_id = ${loan.book_id} `;
+          pool.query(deleteQuery);
+        }
+        return updateResult;
+      });
     },
 
     deleteLoan: function (loanId) {
