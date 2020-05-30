@@ -468,13 +468,13 @@ var loans = (function () {
 
         pool.query(updateTimeQuery);
       } else if (loan.status === "canceled" || loan.status === "declined") {
-        var queuedForDeletion = 1; // Sets a delete flag
+        var queuedForDeletion = true; // Sets a delete flag
         var deleteQuery = "DELETE FROM loans WHERE id = ?";
         var inserts = [loan.id];
         deleteQuery = mysql.format(deleteQuery, inserts);
       }
 
-      if (queuedForDeletion === 1) {
+      if (queuedForDeletion === true) {
         // If the goal is to delete the loan, we don't want to update it.
         // As a result, this only updates the loan if the delete flag has been reached.
         return pool.query(deleteQuery);
