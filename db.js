@@ -295,7 +295,7 @@ var friends = (function () {
       });
     },
 
-    getSecondaryFriends: async function (currentUserId) {
+    getSecondaryFriends: function (currentUserId) {
       // Status is guaranteed to be null because that indicates the two users have no relation
       return pool
         .query(
