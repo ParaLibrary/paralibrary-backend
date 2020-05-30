@@ -295,36 +295,27 @@ var friends = (function () {
       });
     },
 
-    getFriendsofFriend: async function (friendId) {
-      var friendData = await friends.getAll(friendId);
-
-      var friendSize = friendData.length;
-
-      for (var i = 0; i < friendSize; i++) {
-        var targetFriend = friendData[i].id;
-        //var friendOfFriend = await friends.getAll(targetFriend);
-
-        var friendQuery =
-          "SELECT u.id, u.name, f.status, u.picture, u.email " +
-          "FROM users u " +
-          "JOIN friendships f ON (u.id = f.friend_id) " +
-          "AND (f.user_id = ?) AND (users.id != ?)";
-
-        var inserts = [targetFriend, friendId];
-        friendQuery = mysql.format(friendQuery, inserts);
-
-        var friendOfFriend = await pool
-          .query(friendQuery)
-          .then(([rows, fields]) => {
-            return rows;
-          });
-
-        friendData[i].friend_of_friend = friendOfFriend;
-
-        //friendData[i].friend_of_friend = friendOfFriend;
-      }
-
-      return friendData;
+    getSecondaryFriends: function (currentUserId) {
+      // Status is guaranteed to be null because that indicates the two users have no relation
+      return pool
+        .query(
+          mysql.format(
+            "SELECT DISTINCT u.id, u.name, null as status, u.picture, u.email " +
+              "FROM friendships a " +
+              "JOIN friendships b ON a.friend_id = b.user_id " +
+              "JOIN users u ON u.id = b.friend_id " +
+              "WHERE a.user_id = ? " +
+              "AND b.friend_id <> a.user_id " +
+              "AND a.status = 'friends' " +
+              "AND b.status = 'friends' " +
+              "AND NOT EXISTS (SELECT * FROM friendships WHERE user_id = a.user_id AND friend_id = u.id) " +
+              "LIMIT 10",
+            [currentUserId]
+          )
+        )
+        .then(([rows, fields]) => {
+          return rows;
+        });
     },
 
     update: async function (userId, friendId, userStatus, friendStatus) {

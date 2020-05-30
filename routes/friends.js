@@ -80,4 +80,16 @@ router.route("/requested").get(function (req, res) {
     });
 });
 
+router.route("/suggested").get(function (req, res) {
+  db.friends
+    .getSecondaryFriends(req.session.userId)
+    .then((friends) => {
+      res.status(200).json(friends);
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(404).end();
+    });
+});
+
 module.exports = router;
