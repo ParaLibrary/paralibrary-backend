@@ -436,7 +436,7 @@ var loans = (function () {
         // Check to see if the requester has an email
 
         var insertQuery =
-          "INSERT INTO loans (book_id, requester_id, status, ) " +
+          "INSERT INTO loans (book_id, requester_id, status) " +
           "VALUES (?,?,?)";
         var insertParams = [loan.book_id, loan.requester_id, loan.status];
         insertQuery = mysql.format(insertQuery, insertParams);
