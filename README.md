@@ -280,6 +280,7 @@ On success, returns status `200` and a JSON array of **User Objects** matching `
 | -----: | -------------------- | ------------------------------------------------------------------------------------------------- |
 |  `GET` | `/friends`           | Returns the current user's friends and people who have requested friendship with the current user |
 |  `GET` | `/friends/requested` | Returns friends the current user has requested friendship with, but they haven't responded        |
+|  `GET` | `/friends/suggested` | Returns up to 10 user objects that the current user has tangential, but not direct, relation to   |
 | `POST` | `/friends/:id`       | Set the friendship status from the current user to the target user                                |
 
 ## `GET /friends`
@@ -309,6 +310,16 @@ None
 ### Response
 
 On success, returns status `200` and JSON array of **User Objects**. Format will be the same as the `GET /friends` route.
+
+## `GET /friends/suggested`
+
+### Fetch Format
+
+None
+
+### Response
+
+On success, returns status `200` and a JSON array of **User Objects**. Format will be the same as the `GET /friends` route.
 
 ## `POST /friends/:id`
 
