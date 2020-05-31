@@ -86,11 +86,12 @@ var books = (function () {
         bookInserts = [currentUserId];
       } else {
         bookQuery =
-          "SELECT b.id, b.user_id, b.title, b.author, b.isbn, b.visibility, b.summary " +
+          "SELECT * " +
           "FROM books b " +
-          "JOIN friendships f ON f.user_id = b.user_id " +
-          "WHERE b.user_id = ? AND f.friend_id = ? " +
-          "AND (b.visibility = 'public' OR (b.visibility = 'friends' AND f.status = 'friends'))";
+          "JOIN friendships f ON b.user_id = f.friend_id " +
+          "WHERE b.user_id = ? " +
+          "AND (b.visibility = 'public' " +
+          "OR (b.visibility = 'friends' AND f.status = 'friends' AND f.user_id = 1 AND f.friend_id = b.user_id))";
         bookInserts = [targetUserId, currentUserId];
       }
 
