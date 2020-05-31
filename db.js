@@ -436,21 +436,27 @@ var loans = (function () {
     },
 
     updateLoanById: async function (loan) {
-      let updateQuery = "UPDATE loans SET status = ? WHERE id = ?";
-      let updateInserts = [loan.status, loan.id];
-      updateQuery = mysql.format(updateQuery, updateInserts);
+      let currentDate = moment().format("YYYY-MM-DD HH:mm:ss");
+      let updateQuery = `UPDATE loans SET status = '${loan.status}', `;
 
-      //var now = moment().format("YYYY-MM-DD HH:mm:ss");
-      //will be used later for timestamps
-      //console.log(now);
+      switch (loan.status) {
+        case "loaned":
+          updateQuery += `loan_start_date = '${currentDate}' WHERE id = ${loan.id}`;
+          break;
+        case "returned":
+          updateQuery += `return_date = '${currentDate}' WHERE id = ${loan.id}`;
+          break;
+        case "accepted":
+          updateQuery += `accept_date = '${currentDate}' WHERE id = ${loan.id}`;
+          break;
+        default:
+          console.log("Invalid status");
+          return Promise.reject();
+      }
 
       return pool.query(updateQuery).then((updateResult) => {
         if (loan.status === "accepted") {
-          let deleteQuery =
-            "DELETE FROM loans WHERE status = 'pending' AND book_id = ?";
-          let deleteInserts = [loan.book_id];
-          deleteQuery = mysql.format(deleteQuery, deleteInserts);
-
+          let deleteQuery = `DELETE FROM loans WHERE status = 'pending' AND book_id = ${loan.book_id} `;
           pool.query(deleteQuery);
         }
         return updateResult;
