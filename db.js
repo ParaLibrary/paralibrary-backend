@@ -86,7 +86,7 @@ var books = (function () {
         bookInserts = [currentUserId];
       } else {
         bookQuery =
-          "SELECT * " +
+          "SELECT b.id, b.user_id, b.title, b.author, b.isbn, b.visibility, b.summary " +
           "FROM books b " +
           "JOIN friendships f ON b.user_id = f.friend_id " +
           "WHERE b.user_id = ? " +
