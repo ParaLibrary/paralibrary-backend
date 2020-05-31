@@ -91,7 +91,7 @@ var books = (function () {
           "JOIN friendships f ON b.user_id = f.friend_id " +
           "WHERE b.user_id = ? " +
           "AND (b.visibility = 'public' " +
-          "OR (b.visibility = 'friends' AND f.status = 'friends' AND f.user_id = 1 AND f.friend_id = b.user_id))";
+          "OR (b.visibility = 'friends' AND f.status = 'friends' AND f.user_id = ? AND f.friend_id = b.user_id))";
         bookInserts = [targetUserId, currentUserId];
       }
 
