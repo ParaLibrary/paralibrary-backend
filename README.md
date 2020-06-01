@@ -427,7 +427,7 @@ On success, returns status `200` and an array of **Loan Objects**. On failure, r
 
 ### Fetch Format
 
-Expects the requester_id, book_id, and status in the body of the request.
+Expects the requester_id, book_id, and status in the body of the request (the status should be 'pending').
 
 ### Response
 
@@ -467,7 +467,7 @@ On success, returns status `200` and a single **Loan Object** matching the :id. 
 
 ### Fetch Format
 
-Expects the id, book_id, and status in the body of the request.
+Expects the id, book_id, and status in the body of the request (status should be anything but 'pending').
 
 ### Response
 
