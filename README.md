@@ -361,7 +361,7 @@ On success, return status `200`. If the id in the URL does not match the id in t
 
 ### Loan Object
 
-The timestamps are return as strings
+The timestamps are return as strings\
 Status can be one of ("pending" | "accepted" | "loaned" | "returned" | "canceled" | "declined")
 
 ```json
