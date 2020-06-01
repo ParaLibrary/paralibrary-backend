@@ -423,16 +423,27 @@ var loans = (function () {
       if (loanCheck[0].count >= 1) {
         // The count will always return a row, so if count === 0,
         // then no row exists with the same requester_id and book_id.
+        console.log("The current user has already requested this book.");
         return Promise.reject();
       } else {
-        // Check to see if the requester has an email
+        getEmailQuery = `SELECT email FROM users WHERE id = ${loan.requester_id}`;
+        var emailCheck = await pool
+          .query(getEmailQuery)
+          .then(([rows, fields]) => {
+            return rows[0];
+          });
 
-        var insertQuery =
-          "INSERT INTO loans (book_id, requester_id, status) " +
-          "VALUES (?,?,?)";
-        var insertParams = [loan.book_id, loan.requester_id, loan.status];
-        insertQuery = mysql.format(insertQuery, insertParams);
-        return pool.query(insertQuery);
+        if (emailCheck.email === null || emailCheck.email === "") {
+          console.log("No email field was found for the loan requester.");
+          return Promise.reject();
+        } else {
+          var insertQuery =
+            "INSERT INTO loans (book_id, requester_id, status) " +
+            "VALUES (?,?,?)";
+          var insertParams = [loan.book_id, loan.requester_id, loan.status];
+          insertQuery = mysql.format(insertQuery, insertParams);
+          return pool.query(insertQuery);
+        }
       }
     },
 

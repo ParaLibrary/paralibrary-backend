@@ -361,7 +361,7 @@ On success, return status `200`. If the id in the URL does not match the id in t
 
 ### Loan Object
 
-The timestamps are return as strings\
+The timestamps are return as strings
 Status can be one of ("pending" | "accepted" | "loaned" | "returned" | "canceled" | "declined")
 
 ```json
@@ -427,7 +427,7 @@ On success, returns status `200` and an array of **Loan Objects**. On failure, r
 
 ### Fetch Format
 
-Expects the requester_id, book_id, and status in the body of the request.
+Expects the requester_id, book_id, and status in the body of the request (the status should be 'pending').
 
 ### Response
 
@@ -467,7 +467,7 @@ On success, returns status `200` and a single **Loan Object** matching the :id. 
 
 ### Fetch Format
 
-Expects the id, book_id, and status in the body of the request.
+Expects the id, book_id, and status in the body of the request (status should be anything but 'pending').
 
 ### Response
 
