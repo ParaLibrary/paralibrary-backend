@@ -24,41 +24,65 @@ pool
 
 var books = (function () {
   async function injectLoanInfo(book, currentUserId) {
-    // Get Loan Count
-    let loanCountQuery = `SELECT COUNT (*) as "count" FROM loans WHERE book_id = '${book.id}'`;
-    let loanCount = await pool.query(loanCountQuery).then(([rows, fields]) => {
+    return new Promise((resolve, reject) => {
+      if (book.user_id == currentUserId) {
+        // For user's own library, get the most recent loan for the book
+        return resolve(getRecentLoan(book));
+      } else {
+        // For another's library, get the user's loan for the book, if it exists
+        return resolve(getCurrentUserLoan(book));
+      }
+    }).then(async (loan) => {
+      if (loan) {
+        var owner = await users.getById(currentUserId, book.user_id);
+        var requester = await users.getById(currentUserId, loan.requester_id);
+        loan.owner = owner;
+        loan.requester = requester;
+      }
+
+      book.loan_count = await getLoanCount(book.id);
+      book.loan = loan;
+
+      return book;
+    });
+  }
+
+  function getLoanCount(bookId) {
+    let loanCountQuery = `SELECT COUNT(*) as "count" FROM loans WHERE book_id = '${bookId}'`;
+    return pool.query(loanCountQuery).then(([rows, fields]) => {
       if (!rows || rows.length === 0) {
         return null;
       }
       return rows[0].count;
     });
+  }
 
+  function getRecentLoan(book) {
     let loanQuery =
       `SELECT * FROM loans WHERE book_id = '${book.id}' ` +
       `ORDER BY accept_date DESC LIMIT 1`;
 
     // Get most recent loan
-    return pool
-      .query(loanQuery)
-      .then(([rows, fields]) => {
-        if (!rows || rows.length === 0) {
-          return null;
-        }
-        return rows[0];
-      })
-      .then(async (loan) => {
-        if (loan) {
-          var owner = await users.getById(book.user_id, currentUserId);
-          var requester = await users.getById(currentUserId, loan.requester_id);
-          loan.owner = owner;
-          loan.requester = requester;
-        }
+    return pool.query(loanQuery).then(([rows, fields]) => {
+      if (!rows || rows.length === 0) {
+        return null;
+      }
+      return rows[0];
+    });
+  }
 
-        book.loan_count = loanCount;
-        book.loan = loan;
+  function getCurrentUserLoan(book) {
+    let loanQuery =
+      `SELECT * FROM loans WHERE book_id = '${book.id}' ` +
+      `ORDER BY accept_date DESC LIMIT 1`;
 
-        return book;
-      });
+    // Get most recent loan
+    return pool.query(loanQuery).then(([rows, fields]) => {
+      if (!rows || rows.length === 0) {
+        return null;
+      }
+      return rows[0];
+    });
   }
 
   function injectCategories(book) {
