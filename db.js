@@ -59,7 +59,7 @@ var books = (function () {
 
   function getRecentLoan(book) {
     let loanQuery =
-      `SELECT * FROM loans WHERE book_id = '${book.id}' ` +
+      `SELECT ${loans.loanColumns()} FROM loans WHERE book_id = '${book.id}' ` +
       `ORDER BY accept_date DESC LIMIT 1`;
 
     // Get most recent loan
@@ -73,7 +73,7 @@ var books = (function () {
 
   function getCurrentUserLoan(book) {
     let loanQuery =
-      `SELECT * FROM loans WHERE book_id = '${book.id}' ` +
+      `SELECT ${loans.loanColumns()} FROM loans WHERE book_id = '${book.id}' ` +
       `ORDER BY accept_date DESC LIMIT 1`;
 
     // Get most recent loan
@@ -102,20 +102,23 @@ var books = (function () {
   }
 
   return {
+    bookColumns: () =>
+      "CAST(books.id AS CHAR(50)) as id, CAST(books.user_id AS CHAR(50)) as user_id, books.title, books.author, books.isbn, books.visibility, books.summary",
+
     getAll: async function (currentUserId, targetUserId) {
       let bookQuery;
       let bookInserts;
       if (currentUserId === targetUserId) {
-        bookQuery = "SELECT * FROM books WHERE user_id = ?";
+        bookQuery = `SELECT ${this.bookColumns()} FROM books WHERE user_id = ?`;
         bookInserts = [currentUserId];
       } else {
         bookQuery =
-          "SELECT DISTINCT b.id, b.user_id, b.title, b.author, b.isbn, b.visibility, b.summary " +
-          "FROM books b " +
-          "JOIN friendships f ON b.user_id = f.friend_id " +
-          "WHERE b.user_id = ? " +
-          "AND (b.visibility = 'public' " +
-          "OR (b.visibility = 'friends' AND f.status = 'friends' AND f.user_id = ? AND f.friend_id = b.user_id))";
+          `SELECT DISTINCT ${this.bookColumns()} ` +
+          "FROM books " +
+          "JOIN friendships ON books.user_id = friendships.friend_id " +
+          "WHERE books.user_id = ? " +
+          "AND (books.visibility = 'public' " +
+          "OR (books.visibility = 'friends' AND friendships.status = 'friends' AND friendships.user_id = ? AND friendships.friend_id = books.user_id))";
         bookInserts = [targetUserId, currentUserId];
       }
 
@@ -141,7 +144,7 @@ var books = (function () {
       return Promise.resolve(retrievedBooks);
     },
     get: async function (bookId, needLoanData = true, currentUserId) {
-      var sql = "SELECT * FROM books WHERE id = ?";
+      var sql = `SELECT ${this.bookColumns()} FROM books WHERE id = ?`;
       var inserts = [bookId];
       sql = mysql.format(sql, inserts);
 
@@ -295,7 +298,7 @@ var friends = (function () {
   return {
     getAll: function (currentId) {
       var sql =
-        "SELECT users.id, name, status, picture, email " +
+        `SELECT ${users.userColumns()} ` +
         "FROM users " +
         "JOIN friendships ON users.id = friendships.friend_id AND friendships.user_id = ? ";
       var inserts = [currentId];
@@ -308,7 +311,7 @@ var friends = (function () {
 
     get: function (friendId) {
       var sql =
-        "SELECT friend_id, status, name, picture, email " +
+        `SELECT ${users.userColumns()} ` +
         "FROM friendships JOIN users " +
         "ON friend_id = id " +
         "WHERE user_id = ?";
@@ -325,7 +328,7 @@ var friends = (function () {
       return pool
         .query(
           mysql.format(
-            "SELECT DISTINCT u.id, u.name, null as status, u.picture, u.email " +
+            "SELECT DISTINCT CAST(u.id AS CHAR(50)) as id, u.name, null as status, u.picture, u.email " +
               "FROM friendships a " +
               "JOIN friendships b ON a.friend_id = b.user_id " +
               "JOIN users u ON u.id = b.friend_id " +
@@ -377,20 +380,23 @@ var libraries = (function () {
 
 var loans = (function () {
   return {
+    loanColumns: () =>
+      "CAST(loans.id AS CHAR(50)) as id, loans.requester_id, CAST(loans.book_id AS CHAR(50)) as book_id, loans.request_date, loans.accept_date, loans.loan_start_date, loans.loan_end_date, loans.status",
+
     getAllLoans: function (userId) {
       return loans.baseQuery(
-        `WHERE (u.id = '${userId}') OR (requester_id = '${userId}')`
+        `WHERE (users.id = '${userId}') OR (loans.requester_id = '${userId}')`
       );
     },
     getLoansByOwner: function (userId) {
-      return loans.baseQuery(`WHERE u.id = '${userId}'`, userId);
+      return loans.baseQuery(`WHERE users.id = '${userId}'`, userId);
     },
     getLoansByRequester: function (userId) {
-      return loans.baseQuery(`WHERE l.requester_id = '${userId}'`, userId);
+      return loans.baseQuery(`WHERE loans.requester_id = '${userId}'`, userId);
     },
     getLoanById: function (loanId, userId) {
       return loans
-        .baseQuery(`WHERE l.id = '${loanId}'`, userId)
+        .baseQuery(`WHERE loans.id = '${loanId}'`, userId)
         .then((rows) => {
           if (rows.length === 0) {
             return null;
@@ -401,11 +407,10 @@ var loans = (function () {
 
     baseQuery: async function (whereClause, userId) {
       var loanQuery =
-        "SELECT l.id, l.requester_id, l.book_id, " +
-        "l.request_date, l.accept_date, l.loan_start_date, l.loan_end_date, l.status " +
-        "FROM loans l " +
-        "JOIN books b ON l.book_id = b.id " +
-        "JOIN users u on b.user_id = u.id " +
+        `SELECT ${this.loanColumns()} ` +
+        "FROM loans " +
+        "JOIN books ON loans.book_id = books.id " +
+        "JOIN users on books.user_id = users.id " +
         whereClause;
 
       return pool
@@ -508,13 +513,15 @@ var loans = (function () {
 })();
 
 var users = (function () {
-  const userBaseQuery =
-    "SELECT users.id, name, status, picture, email " +
-    "FROM users " +
-    "LEFT JOIN friendships ON users.id = friendships.friend_id AND friendships.user_id = ? ";
   return {
+    userColumns: () =>
+      "CAST(users.id AS CHAR(50)) as id, users.name, friendships.status, users.picture, users.email ",
+    userBaseQuery: () =>
+      `SELECT ${users.userColumns()} ` +
+      "FROM users " +
+      "LEFT JOIN friendships ON users.id = friendships.friend_id AND friendships.user_id = ? ",
     getUserByName: function (currentId, nameSearch) {
-      var sql = userBaseQuery + "WHERE name LIKE ? LIMIT 20";
+      var sql = this.userBaseQuery() + "WHERE name LIKE ? LIMIT 20";
       var inserts = [currentId, `${nameSearch}%`];
       sql = mysql.format(sql, inserts);
       return pool.query(sql).then(([rows, fields]) => {
@@ -522,7 +529,7 @@ var users = (function () {
       });
     },
     getById: function (currentId, targetId) {
-      var sql = userBaseQuery + "WHERE users.id = ?";
+      var sql = this.userBaseQuery() + "WHERE users.id = ?";
       var inserts = [currentId, targetId];
       sql = mysql.format(sql, inserts);
 
@@ -535,7 +542,7 @@ var users = (function () {
     },
     getByGoogleId: function (googleId) {
       // This query is only used internally, so the formatting of the columns doesn't matter
-      var sql = "SELECT * FROM users WHERE google_id = ?";
+      var sql = `SELECT ${this.userColumns()} FROM users WHERE google_id = ?`;
       var inserts = [googleId];
       sql = mysql.format(sql, inserts);
 

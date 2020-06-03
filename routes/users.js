@@ -3,8 +3,7 @@ var router = express.Router();
 var db = require("../db.js");
 
 router.route("/").get(function (req, res) {
-  let user = req.body;
-  db.users.getById(user).then((user) => {
+  db.users.getById(req.session.userId, req.session.userId).then((user) => {
     if (!user) {
       res.statusCode = 404;
       res.end();
