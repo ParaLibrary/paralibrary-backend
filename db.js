@@ -542,7 +542,7 @@ var users = (function () {
     },
     getByGoogleId: function (googleId) {
       // This query is only used internally, so the formatting of the columns doesn't matter
-      var sql = `SELECT ${this.userColumns()} FROM users WHERE google_id = ?`;
+      var sql = `SELECT CAST(users.id AS CHAR(50)) as id, users.name, null as status, users.picture, users.email FROM users WHERE google_id = ?`;
       var inserts = [googleId];
       sql = mysql.format(sql, inserts);
 
